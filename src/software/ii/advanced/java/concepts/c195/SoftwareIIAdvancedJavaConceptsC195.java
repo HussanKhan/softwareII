@@ -36,9 +36,7 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
     public void start(Stage primaryStage) {
         
         langCode = new LanguageWindow().displayLangWindow();
-        
-        apiDB.getData();
-        
+
         // HEADER
         Label sceneHeader = new Label( getLangKey(langCode, countryCode, "promptCat") );
         sceneHeader.setStyle("-fx-font-weight: bold");

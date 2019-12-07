@@ -40,6 +40,41 @@ public class SQLDriver {
         
     };
     
+    // Add country if not in DB
+    public int setCountry(String country, String username) {
+        
+        // check to see if in DB
+        String command;
+        try {
+             // QUERY
+             Statement statement = connection.createStatement();
+             // EXECUTE
+             ResultSet result = statement.executeQuery(String.format("SELECT * FROM country WHERE country = '%s';", (country)));
+
+             result.last();
+             
+             // already in DB
+             if (result.getRow() > 0) {
+                 return 1;
+             }
+        
+        } catch (Exception exc) {
+            System.out.println(exc);
+        };
+
+        
+        // Insert into DB
+        try {
+             command = String.format("INSERT INTO country (country, createdate, createdBy, lastUpdateBy) VALUES ('%s', NOW(), '%s', '%s');", country, username, username);
+             statement.executeUpdate(command);
+        
+        } catch (Exception exc) {
+            System.out.println(exc);
+        };
+     
+        return 0;
+    };
+    
     // Set country
 //    public int setCountry() {
 //        
