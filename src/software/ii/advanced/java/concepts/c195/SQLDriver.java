@@ -49,7 +49,7 @@ public class SQLDriver {
              // QUERY
              Statement statement = connection.createStatement();
              // EXECUTE
-             ResultSet result = statement.executeQuery(String.format("SELECT * FROM country WHERE country = '%s';", (country)));
+             ResultSet result = statement.executeQuery(String.format("SELECT * FROM country WHERE country = '%s';", country ));
 
              result.last();
              
@@ -66,6 +66,83 @@ public class SQLDriver {
         // Insert into DB
         try {
              command = String.format("INSERT INTO country (country, createdate, createdBy, lastUpdateBy) VALUES ('%s', NOW(), '%s', '%s');", country, username, username);
+             statement.executeUpdate(command);
+        
+        } catch (Exception exc) {
+            System.out.println(exc);
+        };
+     
+        return 0;
+    };
+    
+    // Add city if not in DB
+    public int setCity(String city, String username, String country) {
+        
+        // check to see if in DB
+        String command;
+        try {
+             // QUERY
+             Statement statement = connection.createStatement();
+             // EXECUTE
+             ResultSet result = statement.executeQuery(String.format("SELECT * FROM city WHERE city = '%s';", city));
+
+             result.last();
+             
+             // already in DB
+             if (result.getRow() > 0) {
+                 return 1;
+             }
+        
+        } catch (Exception exc) {
+            System.out.println(exc);
+        };
+
+        
+        // Insert into DB
+        try {
+             command = String.format("INSERT INTO city (city, countryId, createdate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT countryId FROM country WHERE country='%s'), NOW(), '%s', '%s');", city, country, username, username );
+             statement.executeUpdate(command);
+        
+        } catch (Exception exc) {
+            System.out.println(exc);
+        };
+     
+        return 0;
+    };
+    
+    
+        // Add city if not in DB
+    public int setAddress(
+            String address, 
+            String address2, 
+            String city, 
+            String postal, 
+            String phone,
+            String username) {
+        
+        // check to see if in DB
+        String command;
+        try {
+             // QUERY
+             Statement statement = connection.createStatement();
+             // EXECUTE
+             ResultSet result = statement.executeQuery(String.format("SELECT * FROM city WHERE city = '%s';", city));
+
+             result.last();
+             
+             // already in DB
+             if (result.getRow() > 0) {
+                 return 1;
+             }
+        
+        } catch (Exception exc) {
+            System.out.println(exc);
+        };
+
+        
+        // Insert into DB
+        try {
+             command = String.format("INSERT INTO city (city, countryId, createdate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT countryId FROM country WHERE country='%s'), NOW(), '%s', '%s');", city, country, username, username );
              statement.executeUpdate(command);
         
         } catch (Exception exc) {
