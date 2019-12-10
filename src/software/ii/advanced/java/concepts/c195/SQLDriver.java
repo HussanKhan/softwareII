@@ -65,7 +65,7 @@ public class SQLDriver {
         
         // Insert into DB
         try {
-             command = String.format("INSERT INTO country (country, createdate, createdBy, lastUpdateBy) VALUES ('%s', NOW(), '%s', '%s');", country, username, username);
+             command = String.format("INSERT INTO country (country, createDate, createdBy, lastUpdateBy) VALUES ('%s', NOW(), '%s', '%s');", country, username, username);
              statement.executeUpdate(command);
         
         } catch (Exception exc) {
@@ -100,7 +100,7 @@ public class SQLDriver {
         
         // Insert into DB
         try {
-             command = String.format("INSERT INTO city (city, countryId, createdate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT countryId FROM country WHERE country='%s'), NOW(), '%s', '%s');", city, country, username, username );
+             command = String.format("INSERT INTO city (city, countryId, createDate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT countryId FROM country WHERE country='%s'), NOW(), '%s', '%s');", city, country, username, username );
              statement.executeUpdate(command);
         
         } catch (Exception exc) {
@@ -126,7 +126,7 @@ public class SQLDriver {
              // QUERY
              Statement statement = connection.createStatement();
              // EXECUTE
-             ResultSet result = statement.executeQuery(String.format("SELECT * FROM city WHERE city = '%s';", city));
+             ResultSet result = statement.executeQuery(String.format("SELECT * FROM address WHERE address = '%s' AND postalCode = '%s' AND phone = '%s';", address, postal, phone));
 
              result.last();
              
@@ -142,7 +142,7 @@ public class SQLDriver {
         
         // Insert into DB
         try {
-             command = String.format("INSERT INTO city (city, countryId, createdate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT countryId FROM country WHERE country='%s'), NOW(), '%s', '%s');", city, country, username, username );
+             command = String.format("INSERT INTO address (address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdateBy) VALUES ('%s', '%s', (SELECT cityId FROM city WHERE city='%s'), '%s', '%s', NOW(), '%s', '%S');", address, address2, city, postal, phone, username, username );
              statement.executeUpdate(command);
         
         } catch (Exception exc) {
@@ -152,6 +152,47 @@ public class SQLDriver {
         return 0;
     };
     
+        // Add city if not in DB
+    public int setCustomer(
+            String customerName, 
+            String active, 
+            String address,  
+            String city, 
+            String postal, 
+            String phone,
+            String username) {
+        
+        // check to see if in DB
+        String command;
+        try {
+             // QUERY
+             Statement statement = connection.createStatement();
+             // EXECUTE
+             ResultSet result = statement.executeQuery(String.format("SELECT * FROM customer WHERE customerName='%s' AND addressId='(SELECT addressId FROM address WHERE address='%s' AND postalCode='%s' AND phone='%s')';", customerName, address, postal, phone));
+
+             result.last();
+             
+             // already in DB
+             if (result.getRow() > 0) {
+                 return 1;
+             }
+        
+        } catch (Exception exc) {
+            System.out.println(exc);
+        };
+
+        
+        // Insert into DB
+        try {
+             command = String.format("INSERT INTO customer (customerName, addressId, active, createDate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT addressId FROM address WHERE address='%s' AND postalCode='%s' AND phone='%s'), NOW(), '%s', '%S');", customerName, address, postal, phone, username, username );
+             statement.executeUpdate(command);
+        
+        } catch (Exception exc) {
+            System.out.println(exc);
+        };
+     
+        return 0;
+    };
     // Set country
 //    public int setCountry() {
 //        
