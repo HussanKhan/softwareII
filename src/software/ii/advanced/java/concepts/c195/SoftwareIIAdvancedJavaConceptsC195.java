@@ -36,6 +36,9 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
     public void start(Stage primaryStage) {
         
         langCode = new LanguageWindow().displayLangWindow();
+        
+        // customer data
+        apiDB.customerData("Jesus B. Sardina", "1", "189 Gore Bates", "", "82050", "+1(555)-6882527", "Gulfport", "United States");
 
         // HEADER
         Label sceneHeader = new Label( getLangKey(langCode, countryCode, "promptCat") );
