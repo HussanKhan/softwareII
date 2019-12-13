@@ -159,13 +159,15 @@ public class SQLDriver {
     
         // Add city if not in DB
     public int setCustomer(
-            String customerName, 
-            String active, 
-            String address,  
-            String city, 
+            String customerName,
+            String active,
+            String address, 
+            String address2,
             String postal, 
             String phone,
-            String username) {
+            String city,
+            String country,
+	    String username) {
         
         // check to see if in DB
         String command;
@@ -189,6 +191,15 @@ public class SQLDriver {
         
         // Insert into DB
         try {
+            
+         // Add country
+         setCountry(country, username);
+         // Add City
+         setCity(city, username, country);
+         
+        // Add address
+         setAddress(address, address2, city, postal, phone, username);
+
              command = String.format("INSERT INTO customer (customerName, addressId, active, createDate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT addressId FROM address WHERE address='%s' AND postalCode='%s' AND phone='%s'), %s, NOW(), '%s', '%S');", customerName, address, postal, phone, active, username, username );
              statement.executeUpdate(command);
         
@@ -247,7 +258,7 @@ public class SQLDriver {
      
         return 0;
     };
-    
+      
     public int customerData(
             String customerName,
             String active,
@@ -256,24 +267,44 @@ public class SQLDriver {
             String postal, 
             String phone,
             String city,
-            String country
+            String country,
+            String username
         ) {
         
-//         // Add country
-//         setCountry(country, username);
-//         
-//         // Add City
-//         setCity(city, username, country);
-//         
-//         // Add address
-//         setAddress(address, address2, city, postal, phone, username);
-//         
-//         // Add Customer
-//         setCustomer(customerName, active, address, city, postal, phone, username);
-         
-         
+        // Add Customer
+        setCustomer(
+                customerName,
+                active,
+                address, 
+                address2,
+                postal, 
+                phone,
+                city,
+                country,
+                username
+        );
+        
         return 0;
+ 
+    };
     
+    public int getAllCustomers(){
+        
+        try {
+            ResultSet result = statement.executeQuery("SELECT * FROM address;");
+            
+            while (result.next()) {
+                 // name of column
+                 System.out.println(result.getString(1));
+                 System.out.println(result.getString(2));
+                 System.out.println(result.getString(3));
+                 System.out.println(result.getString(4));
+                 System.out.println(result.getString(5));
+             };
+             
+        } catch (Exception err) {};
+            
+        return 0;
     };
     // Set country
 //    public int setCountry() {

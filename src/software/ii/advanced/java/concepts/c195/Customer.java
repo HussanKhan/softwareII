@@ -11,58 +11,43 @@ package software.ii.advanced.java.concepts.c195;
  */
 public class Customer {
     
-    private String userId;
-    private String userName;
-    private String password;
+    private String customerName;
     private String active;
-    private String createDate;
-    private String createdBy;
-    private String lastUpdate;
-    private String lastUpdateBy;
+    private String address; 
+    private String address2;
+    private String city;
+    private String postal;
+    private String phone;
+    private String country;
     
     // construct
     public Customer(
-            String userId,
-            String userName,
-            String password,
+            String customerName,
             String active,
-            String createDate,
-            String createdBy,
-            String lastUpdate,
-            String lastUpdateBy
+            String address, 
+            String address2,
+            String city,
+            String postal,
+            String phone,
+            String country
     ) {
-        this.userId = userId;
-        this.userName = userName;
-        this.password = password;
+        
+        this.customerName = customerName;
         this.active = active;
-        this.createDate = createDate;
-        this.createdBy = createdBy;
-        this.lastUpdate = lastUpdate;
-        this.lastUpdateBy = lastUpdateBy;
+        this.address = address;
+        this.address2 = address2;
+        this.city = city;
+        this.postal = postal;
+        this.phone = phone;
+        this.country = country;
     };
 
-    public String getUserId() {
-        return userId;
+    public String getCustomerName() {
+        return customerName;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     public String getActive() {
@@ -73,37 +58,55 @@ public class Customer {
         this.active = active;
     }
 
-    public String getCreateDate() {
-        return createDate;
+    public String getAddress() {
+        return address;
     }
 
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public String getAddress2() {
+        return address2;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
+    public void setAddress2(String address2) {
+        this.address2 = address2;
     }
 
-    public String getLastUpdate() {
-        return lastUpdate;
+    public String getCity() {
+        return city;
     }
 
-    public void setLastUpdate(String lastUpdate) {
-        this.lastUpdate = lastUpdate;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    public String getLastUpdateBy() {
-        return lastUpdateBy;
+    public String getPostal() {
+        return postal;
     }
 
-    public void setLastUpdateBy(String lastUpdateBy) {
-        this.lastUpdateBy = lastUpdateBy;
+    public void setPostal(String postal) {
+        this.postal = postal;
     }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+    
+    
 
     
 }
