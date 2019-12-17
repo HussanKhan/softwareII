@@ -42,7 +42,7 @@ public class Customer_CRUD {
         lastStage = mainStage;
     };
     
-    
+    // makes customer scene
     public Scene generateCustomer () {
         
         // layout

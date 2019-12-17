@@ -6,6 +6,8 @@
 package software.ii.advanced.java.concepts.c195;
 
 import java.sql.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -288,23 +290,74 @@ public class SQLDriver {
  
     };
     
-    public int getAllCustomers(){
+    // returns all data from result set
+    private void printAllData(ResultSet result) {
         
         try {
-            ResultSet result = statement.executeQuery("SELECT * FROM address;");
+        
+            int colNumbers = result.getMetaData().getColumnCount() + 1;
+            
+            System.out.println("---------------------------------------------------------------------------------------");
             
             while (result.next()) {
-                 // name of column
-                 System.out.println(result.getString(1));
-                 System.out.println(result.getString(2));
-                 System.out.println(result.getString(3));
-                 System.out.println(result.getString(4));
-                 System.out.println(result.getString(5));
+                
+                for (int i = 1; i < colNumbers; i++) {
+                    
+                    System.out.println(result.getMetaData().getColumnName(i) + ": " + result.getString(i));
+                
+                };
+                
+                System.out.println("---------------------------------------------------------------------------------------");
              };
              
         } catch (Exception err) {};
+        
+    };
+    
+    // make fucniton that gets address info based on addressId
+    
+    public ObservableList<Customer> getAllCustomers(){
+        
+        ObservableList<Customer> matches = FXCollections.observableArrayList();
+        
+        try {
+            ResultSet result = statement.executeQuery("SELECT * FROM customer;");
             
-        return 0;
+            int colNumbers = result.getMetaData().getColumnCount() + 1;
+            while (result.next()) {
+                
+                Customer tempCustomer = new Customer();
+                
+                for (int i = 1; i < colNumbers; i++) {
+                                        
+                    String colTitle = result.getMetaData().getColumnName(i);
+                    
+                    switch(colTitle) {
+                        
+                        case "customerId":
+                            tempCustomer.setCustomerId(result.getString(i));
+                            break;
+                        
+                        case "customerName":
+                            tempCustomer.setCustomerName(result.getString(i));
+                            break;
+                            
+                        case "addressId":
+                            tempCustomer.setCustomerName(result.getString(i));
+                            break;
+                        
+                    };
+                    
+                
+                };
+                
+             };
+            
+            printAllData(result);
+            
+        } catch (Exception err) {};
+            
+       return matches;
     };
     // Set country
 //    public int setCountry() {

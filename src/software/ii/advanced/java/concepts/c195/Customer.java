@@ -12,6 +12,7 @@ package software.ii.advanced.java.concepts.c195;
 public class Customer {
     
     private String customerName;
+    private String customerId;
     private String active;
     private String address; 
     private String address2;
@@ -22,28 +23,20 @@ public class Customer {
     
     // construct
     public Customer(
-            String customerName,
-            String active,
-            String address, 
-            String address2,
-            String city,
-            String postal,
-            String phone,
-            String country
     ) {
         
-        this.customerName = customerName;
-        this.active = active;
-        this.address = address;
-        this.address2 = address2;
-        this.city = city;
-        this.postal = postal;
-        this.phone = phone;
-        this.country = country;
     };
+    
+    public String getCustomerId() {
+        return customerId;
+    }
 
     public String getCustomerName() {
         return customerName;
+    }
+    
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public void setCustomerName(String customerName) {

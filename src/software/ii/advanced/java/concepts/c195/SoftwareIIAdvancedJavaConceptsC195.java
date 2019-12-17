@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -38,7 +39,7 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         langCode = new LanguageWindow().displayLangWindow();
         
         // customer data
-        apiDB.getAllCustomers();
+        ObservableList<Customer> temp = apiDB.getAllCustomers();
 
         // HEADER
         Label sceneHeader = new Label( getLangKey(langCode, countryCode, "promptCat") );
