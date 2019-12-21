@@ -322,43 +322,85 @@ public class SQLDriver {
         
         try {
             ResultSet result = statement.executeQuery("SELECT * FROM customer;");
-            
-            int colNumbers = result.getMetaData().getColumnCount() + 1;
+
             while (result.next()) {
                 
                 Customer tempCustomer = new Customer();
                 
-                for (int i = 1; i < colNumbers; i++) {
-                                        
-                    String colTitle = result.getMetaData().getColumnName(i);
-                    
-                    switch(colTitle) {
-                        
-                        case "customerId":
-                            tempCustomer.setCustomerId(result.getString(i));
-                            break;
-                        
-                        case "customerName":
-                            tempCustomer.setCustomerName(result.getString(i));
-                            break;
-                            
-                        case "addressId":
-                            tempCustomer.setCustomerName(result.getString(i));
-                            break;
-                        
-                    };
-                    
+                tempCustomer.setCustomerId(result.getString("customerId"));
+                tempCustomer.setCustomerName(result.getString("customerName"));
                 
-                };
+                ResultSet addressData = getAddress(result.getString("addressId"));
                 
+                addressData.next();
+                
+                tempCustomer.setAddress(addressData.getString("address"));
+                tempCustomer.setAddress2(addressData.getString("address2"));
+                tempCustomer.setPostal(addressData.getString("postalCode"));
+                tempCustomer.setPhone(addressData.getString("phone"));
+                
+                ResultSet cityData = getCity(addressData.getString("cityId"));
+                cityData.next();
+                
+                tempCustomer.setCity(cityData.getString("city"));
+                
+                ResultSet countryData = getCountry(cityData.getString("countryId"));
+                countryData.next();
+                
+                tempCustomer.setCountry(countryData.getString("country"));
+                
+                
+//                ResultSet addressResult = getAddress(result.getString(i));
+                
+                matches.add(tempCustomer);
+                
+//                System.out.println("RAN ONCE");
              };
-            
-            printAllData(result);
             
         } catch (Exception err) {};
             
        return matches;
     };
+    
+    public ResultSet getAddress(String addressId){
+        
+        try {
+            ResultSet result = statement.executeQuery(String.format("SELECT * FROM address WHERE addressId = '%s';", addressId));
+                  
+            return result;
+            
+        } catch (Exception err) {};
+        
+        return null;
+    
+    };
+    
+    public ResultSet getCity(String cityId){
+        
+        try {
+            ResultSet result = statement.executeQuery(String.format("SELECT * FROM city WHERE cityId = '%s';", cityId));
+                  
+            return result;
+            
+        } catch (Exception err) {};
+        
+        return null;
+    
+    };
+    
+    public ResultSet getCountry(String countryId){
+        
+        try {
+            ResultSet result = statement.executeQuery(String.format("SELECT * FROM country WHERE countryId = '%s';", countryId));
+                  
+            return result;
+            
+        } catch (Exception err) {};
+        
+        return null;
+    
+    };
+        
     // Set country
 //    public int setCountry() {
 //        
