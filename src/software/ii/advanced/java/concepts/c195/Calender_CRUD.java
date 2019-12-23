@@ -21,13 +21,14 @@ public class Calender_CRUD {
     
     private Scene lastScene;
     private Stage lastStage;
+    private String username;
     
-    public Calender_CRUD(Scene prevScene, Stage mainStage) {
+    public Calender_CRUD(Scene prevScene, Stage mainStage, String usernam) {
         
         if (prevScene != null) {
             lastScene = prevScene;
         };
-        
+        this.username = username;
         lastStage = mainStage;
     };
     

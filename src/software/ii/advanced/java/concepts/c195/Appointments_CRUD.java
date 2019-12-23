@@ -22,13 +22,14 @@ public class Appointments_CRUD {
         
     private Scene lastScene;
     private Stage lastStage;
+    private String username;
     
-    public Appointments_CRUD(Scene prevScene, Stage mainStage) {
+    public Appointments_CRUD(Scene prevScene, Stage mainStage, String username) {
         
         if (prevScene != null) {
             lastScene = prevScene;
         };
-        
+        this.username = username;
         lastStage = mainStage;
     };
     

@@ -29,12 +29,15 @@ public class Customer_CRUD {
     private Scene lastScene;
     private Stage lastStage;
     private SQLDriver apiDB = new SQLDriver();
+    private String username;
     
     TableView<Customer> customerTable;
     
     Customer selectedCustomer;
     
-    public Customer_CRUD(Scene prevScene, Stage mainStage) {
+    public Customer_CRUD(Scene prevScene, Stage mainStage, String username) {
+        
+        this.username = username;
         
         // Table Columns
         TableColumn<Customer, String> id = new TableColumn<>("ID");
@@ -187,7 +190,21 @@ public class Customer_CRUD {
         addButton.setMinWidth(200);
         
         addButton.setOnAction(e -> {
-            window.close(); // window closes itself
+                   
+            apiDB.setCustomer(
+                    nameInput.getText(),
+                    "1",
+                    addressInput.getText(),
+                    address2Input.getText(),
+                    postalInput.getText(),
+                    phoneInput.getText(),
+                    cityInput.getText(),
+                    countryInput.getText(),
+                    username
+            );
+            
+            window.close();
+     
         });
         
         // Mappings
@@ -233,7 +250,7 @@ public class Customer_CRUD {
 
         // don;t allow user to click anything else until they deal with window
         window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("TEST");
+        window.setTitle("Add Customer");
         window.setMinWidth(250); // 250px min width
         window.setScene(scene);
         window.showAndWait(); // special way to show, and wait for close to reurn to caller

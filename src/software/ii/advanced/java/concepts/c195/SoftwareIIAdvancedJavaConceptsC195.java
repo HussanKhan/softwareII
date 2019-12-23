@@ -32,6 +32,7 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
     
     private String langCode = "es";
     private String countryCode = "US";
+    private String userName = "";
     
     @Override
     public void start(Stage primaryStage) {
@@ -40,7 +41,6 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         
         // customer data
         ObservableList<Customer> temp = apiDB.getAllCustomers();
-        temp.get(0).printAll();
 
         // HEADER
         Label sceneHeader = new Label( getLangKey(langCode, countryCode, "promptCat") );
@@ -96,16 +96,14 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         // Login button
         Button loginButton = new Button( getLangKey(langCode, countryCode, "promptCat") );
         loginButton.setOnAction(e -> {
-            System.out.println(userInput.getText());
-            System.out.println(passwordInput.getText());
-            
+                  
             if (apiDB.login(userInput.getText(), passwordInput.getText()) == 0) {
                 errorCat.setText( getLangKey(langCode, countryCode, "errorCat") + ": ");
                 errorMessage.setText( getLangKey(langCode, countryCode, "errorMsg") );
-            }
-            
-            primaryStage.setScene( new NAV_SCENE(null, primaryStage).generateNavScene() );
-            
+            } else {
+                 userName = userInput.getText();
+                 primaryStage.setScene( new NAV_SCENE(null, primaryStage, userName).generateNavScene() );
+            };
             
         });
         

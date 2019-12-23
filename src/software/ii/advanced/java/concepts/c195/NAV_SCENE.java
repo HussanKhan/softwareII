@@ -21,12 +21,14 @@ public class NAV_SCENE {
     
     private Scene lastScene;
     private Stage lastStage;
+    private String username;
     
-    public NAV_SCENE(Scene prevScene, Stage mainStage) {
+    public NAV_SCENE(Scene prevScene, Stage mainStage, String username) {
         
         if (prevScene != null) {
             lastScene = prevScene;
         };
+        this.username = username;
         lastStage = mainStage;
     };
     
@@ -78,7 +80,7 @@ public class NAV_SCENE {
             
            System.out.println("CUSTOMER DATA CLICKED");
            
-           lastStage.setScene( new Customer_CRUD(currentScene, lastStage).generateCustomer());
+           lastStage.setScene( new Customer_CRUD(currentScene, lastStage, username).generateCustomer());
            
         });
 
@@ -90,7 +92,7 @@ public class NAV_SCENE {
         Button appointmentsButton = createButton("Appointments Data");
         appointmentsButton.setOnAction(e -> {
             
-           lastStage.setScene( new Appointments_CRUD(currentScene, lastStage).generateAppointmentCRUD());
+           lastStage.setScene( new Appointments_CRUD(currentScene, lastStage, username).generateAppointmentCRUD());
            
         });
 
@@ -102,7 +104,7 @@ public class NAV_SCENE {
         Button calenderButton = createButton("Calender Data");
         calenderButton.setOnAction(e -> {
             
-           lastStage.setScene( new Calender_CRUD(currentScene, lastStage).generateCalender());
+           lastStage.setScene( new Calender_CRUD(currentScene, lastStage, username).generateCalender());
            
         });
         

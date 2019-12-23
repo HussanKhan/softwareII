@@ -171,6 +171,8 @@ public class SQLDriver {
             String country,
 	    String username) {
         
+        System.out.println(customerName);
+        
         // check to see if in DB
         String command;
         try {
@@ -322,7 +324,7 @@ public class SQLDriver {
         
         try {
             ResultSet result = statement.executeQuery("SELECT * FROM customer;");
-
+            
             while (result.next()) {
                 
                 Customer tempCustomer = new Customer();
@@ -330,8 +332,18 @@ public class SQLDriver {
                 tempCustomer.setCustomerId(result.getString("customerId"));
                 tempCustomer.setCustomerName(result.getString("customerName"));
                 
-                ResultSet addressData = getAddress(result.getString("addressId"));
+                // Temp store address ID
+                tempCustomer.setAddress(result.getString("addressId"));
                 
+                matches.add(tempCustomer);
+
+            };
+            
+            // Loop through customers and fill address data
+            for (Customer tempCustomer : matches) {
+                
+                // Get address id and fill data
+                ResultSet addressData = getAddress(tempCustomer.getAddress());
                 addressData.next();
                 
                 tempCustomer.setAddress(addressData.getString("address"));
@@ -349,15 +361,11 @@ public class SQLDriver {
                 
                 tempCustomer.setCountry(countryData.getString("country"));
                 
-                
-//                ResultSet addressResult = getAddress(result.getString(i));
-                
-                matches.add(tempCustomer);
-                
-//                System.out.println("RAN ONCE");
-             };
+            };
             
-        } catch (Exception err) {};
+        } catch (Exception err) {
+            System.out.println(err);
+        };
             
        return matches;
     };
@@ -515,10 +523,6 @@ public class SQLDriver {
                      System.out.println(result.getMetaData().getColumnName(i));
                  };
                  
-//                 System.out.println(result.getString(2));
-//                 System.out.println(result.getString(3));
-//                 System.out.println(result.getString(4));
-//                 System.out.println(result.getString(5));
              };
             
         
