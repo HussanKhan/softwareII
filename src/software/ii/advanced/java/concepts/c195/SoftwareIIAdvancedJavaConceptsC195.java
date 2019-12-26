@@ -41,6 +41,7 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         
         // customer data
         ObservableList<Customer> temp = apiDB.getAllCustomers();
+        
 
         // HEADER
         Label sceneHeader = new Label( getLangKey(langCode, countryCode, "promptCat") );

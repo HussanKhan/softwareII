@@ -65,12 +65,14 @@ public class Customer_CRUD {
         phone.setCellValueFactory(new PropertyValueFactory<>("phone"));
         
         // Init Table
-        customerTable = new TableView<>();        customerTable.setItems(apiDB.getAllCustomers());
+        customerTable = new TableView<>();        
+        customerTable.setItems(apiDB.getAllCustomers());
         customerTable.getColumns().addAll(id, name, address, address2, city, postal, country, phone);
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         customerTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                  selectedCustomer = customerTable.getSelectionModel().getSelectedItems().get(0);
+                 System.out.println(customerTable.getSelectionModel().getSelectedItems().get(0).getCustomerName());
             }
         });
         
@@ -125,7 +127,7 @@ public class Customer_CRUD {
         Button updateButton = createButton("UPDATE");
         updateButton.setOnAction(e -> {
             
-           System.out.println("update DATA CLICKED");
+           updateCustomer(selectedCustomer);
            
         });
 
@@ -138,6 +140,9 @@ public class Customer_CRUD {
         deleteButton.setOnAction(e -> {
             
            System.out.println("delete DATA CLICKED");
+           
+           apiDB.deleteCustomer( Integer.parseInt(selectedCustomer.getCustomerId()) );
+           customerTable.setItems(apiDB.getAllCustomers());
            
         });
         
@@ -203,6 +208,8 @@ public class Customer_CRUD {
                     username
             );
             
+            customerTable.setItems(apiDB.getAllCustomers());
+            
             window.close();
      
         });
@@ -251,6 +258,110 @@ public class Customer_CRUD {
         // don;t allow user to click anything else until they deal with window
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle("Add Customer");
+        window.setMinWidth(250); // 250px min width
+        window.setScene(scene);
+        window.showAndWait(); // special way to show, and wait for close to reurn to caller
+    };
+    
+    
+    public void updateCustomer(Customer customer) {
+        // set stage - window
+        Stage window = new Stage();
+        
+        // Layout
+        GridPane grid = new GridPane(); // content all the way tot he edge of the screen
+        grid.setPadding(new javafx.geometry.Insets(20, 20, 20, 20)); // border padding
+        grid.setVgap(30); // spacing bewteen all objects
+        grid.setHgap(30); // spacing bewteen all objects
+        
+        // field titles
+        Label name = new Label("Name");
+        Label address = new Label("Address");
+        Label address2 = new Label("Address 2");
+        Label city = new Label("City");
+        Label postal = new Label("Postal");
+        Label country = new Label("Country");
+        Label phone = new Label("Phone");
+        
+        // field inputs
+        TextField nameInput = new TextField( customer.getCustomerName() );
+        TextField addressInput = new TextField( customer.getAddress() );
+        TextField address2Input = new TextField( customer.getAddress2() );
+        TextField cityInput = new TextField( customer.getCity() );
+        TextField postalInput = new TextField( customer.getPostal() );
+        TextField countryInput = new TextField( customer.getCountry() );
+        TextField phoneInput = new TextField( customer.getPhone() );
+        
+        // Add Button
+        Button updateButton = new Button("Update Customer");
+        updateButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+        updateButton.setMinWidth(200);
+        
+        updateButton.setOnAction(e -> {
+                   
+            apiDB.updateCustomer(
+                    customer.getCustomerId(),
+                    nameInput.getText(),
+                    "1",
+                    addressInput.getText(),
+                    address2Input.getText(),
+                    postalInput.getText(),
+                    phoneInput.getText(),
+                    cityInput.getText(),
+                    countryInput.getText(),
+                    username
+            );
+            
+            customerTable.setItems(apiDB.getAllCustomers());
+            
+            window.close();
+     
+        });
+        
+        // Mappings
+        GridPane.setConstraints(name, 0, 0);
+        GridPane.setConstraints(nameInput, 1, 0);
+        
+        GridPane.setConstraints(address, 0, 1);
+        GridPane.setConstraints(addressInput, 1, 1);
+        
+        GridPane.setConstraints(address2, 0, 2);
+        GridPane.setConstraints(address2Input, 1, 2);
+        
+        GridPane.setConstraints(city, 0, 3);
+        GridPane.setConstraints(cityInput, 1, 3);
+        
+        GridPane.setConstraints(postal, 0, 4);
+        GridPane.setConstraints(postalInput, 1, 4);
+        
+        GridPane.setConstraints(country, 0, 5);
+        GridPane.setConstraints(countryInput, 1, 5);
+        
+        GridPane.setConstraints(phone, 0, 6);
+        GridPane.setConstraints(phoneInput, 1, 6);
+        
+        GridPane.setConstraints(updateButton, 1, 7);
+        
+        // Add values to grid
+        grid.getChildren().addAll(
+                name, address, address2, city, postal, country, phone,
+                nameInput, addressInput, address2Input, cityInput, postalInput, countryInput, phoneInput, updateButton
+        );
+        
+        grid.setAlignment( Pos.CENTER );
+        
+        // layout - add objects
+        VBox layout = new VBox(20);
+        layout.getChildren().addAll(grid);
+        layout.setAlignment(Pos.CENTER); // CENTER EVERYTHING
+        layout.setPadding(new javafx.geometry.Insets(20,20,20,20));
+        
+        // scene - add layout to scene
+        Scene scene = new Scene(layout);
+
+        // don;t allow user to click anything else until they deal with window
+        window.initModality(Modality.APPLICATION_MODAL);
+        window.setTitle("Update Customer");
         window.setMinWidth(250); // 250px min width
         window.setScene(scene);
         window.showAndWait(); // special way to show, and wait for close to reurn to caller

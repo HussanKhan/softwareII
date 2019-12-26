@@ -231,35 +231,6 @@ public class SQLDriver {
             String end
             ) {
         
-        // check to see if in DB
-//        String command;
-//        try {
-//             // QUERY
-//             Statement statement = connection.createStatement();
-//             // EXECUTE
-//             ResultSet result = statement.executeQuery(String.format("SELECT * FROM customer WHERE customerName='%s' AND addressId='(SELECT addressId FROM address WHERE address='%s' AND postalCode='%s' AND phone='%s')';", customerName, address, postal, phone));
-//
-//             result.last();
-//             
-//             // already in DB
-//             if (result.getRow() > 0) {
-//                 return 1;
-//             }
-//        
-//        } catch (Exception exc) {
-//            System.out.println(exc);
-//        };
-
-//        
-//        // Insert into DB
-//        try {
-//             command = String.format("INSERT INTO customer (customerName, addressId, active, createDate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT addressId FROM address WHERE address='%s' AND postalCode='%s' AND phone='%s'), NOW(), '%s', '%S');", customerName, address, postal, phone, username, username );
-//             statement.executeUpdate(command);
-//        
-//        } catch (Exception exc) {
-//            System.out.println(exc);
-//        };
-     
         return 0;
     };
       
@@ -370,6 +341,41 @@ public class SQLDriver {
        return matches;
     };
     
+    public void deleteCustomer(int id) {
+        try {
+            ResultSet result = statement.executeQuery(String.format("SELECT * FROM customer WHERE customerId = '%s';", id));  
+            result.next();
+            
+            String addressId = result.getString("addressId");
+            
+            statement.executeUpdate(String.format("DELETE FROM customer WHERE customerId = '%s';", id));
+            statement.executeUpdate(String.format("DELETE FROM address WHERE addressId = '%s';", addressId));
+
+        } catch (Exception err) {
+            System.out.println(err);
+        };
+    };
+    
+    public void updateCustomer(
+            String id,
+            String customerName,
+            String active,
+            String address, 
+            String address2,
+            String postal, 
+            String phone,
+            String city,
+            String country,
+            String username
+    ) {
+        try {
+            // 
+            statement.executeUpdate(String.format("DELETE FROM customer WHERE customerId = '%s';", id));  
+        } catch (Exception err) {
+            System.out.println(err);
+        };
+    };
+    
     public ResultSet getAddress(String addressId){
         
         try {
@@ -409,59 +415,12 @@ public class SQLDriver {
     
     };
         
-    // Set country
-//    public int setCountry() {
-//        
-//        String command;
-//        
-//        try {
-//             
-//             // insert country into db
-//             command = String.format("INSERT INTO country (country, createdate, createdBy, lastUpdateBy) VALUES ('%s', NOW(), '%s', '%s');", "United States", username, username);
-//             statement.executeUpdate(command);
-//             command = String.format("INSERT INTO country (country, createdate, createdBy, lastUpdateBy) VALUES ('%s', NOW(), '%s', '%s');", "England", username, username);
-//             statement.executeUpdate(command);
-//             
-//             
-//             return 0;
-//        
-//             
-//        } catch (Exception exc) {
-//            System.out.println(exc);
-//        };
-//        
-//        return 0;
-//    };
-    
-//        // Set country
-//    public int setCity() {
-//        
-//        String command;
-//        
-//        try {
-//             
-//             // insert country into db
-//             command = String.format("INSERT INTO city (city, countryId, createdate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT countryId FROM country WHERE country='United States'), NOW(), '%s', '%s');", "Phoenix", username, username);
-//             statement.executeUpdate(command);
-//             command = String.format("INSERT INTO city (city, countryId, createdate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT countryId FROM country WHERE country='United States'), NOW(), '%s', '%s');", "New York", username, username);
-//             statement.executeUpdate(command);
-//             command = String.format("INSERT INTO city (city, countryId, createdate, createdBy, lastUpdateBy) VALUES ('%s', (SELECT countryId FROM country WHERE country='England'), NOW(), '%s', '%s');", "London", username, username);
-//             statement.executeUpdate(command);
-//             return 0;
-//        
-//             
-//        } catch (Exception exc) {
-//            System.out.println(exc);
-//        };
-//        
-//        return 0;
-//    };
-    
     
     public void viewCity() {
         
         try {
-            ResultSet result = statement.executeQuery("SELECT * FROM city;");
+            
+            ResultSet result = statement.executeQuery("SELECT * FROM address;");
             
             while (result.next()) {
                  // name of column
