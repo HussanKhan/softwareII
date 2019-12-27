@@ -9,9 +9,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -179,6 +181,7 @@ public class Customer_CRUD {
         Label postal = new Label("Postal");
         Label country = new Label("Country");
         Label phone = new Label("Phone");
+        Label active = new Label("Customer State: ");
         
         // field inputs
         TextField nameInput = new TextField();
@@ -188,6 +191,9 @@ public class Customer_CRUD {
         TextField postalInput = new TextField();
         TextField countryInput = new TextField();
         TextField phoneInput = new TextField();
+
+        ToggleButton toggleActive = new ToggleButton("Active");
+        toggleActive.setSelected(true);
         
         // Add Button
         Button addButton = new Button("Add Customer");
@@ -195,10 +201,20 @@ public class Customer_CRUD {
         addButton.setMinWidth(200);
         
         addButton.setOnAction(e -> {
+            
+            String activeState;
+            
+            if (toggleActive.selectedProperty().get()) {
+                activeState = "1";
+            } else {
+                activeState = "0";
+            };
+            
+            System.out.println(activeState);
                    
             apiDB.setCustomer(
                     nameInput.getText(),
-                    "1",
+                    activeState,
                     addressInput.getText(),
                     address2Input.getText(),
                     postalInput.getText(),
@@ -236,12 +252,16 @@ public class Customer_CRUD {
         GridPane.setConstraints(phone, 0, 6);
         GridPane.setConstraints(phoneInput, 1, 6);
         
-        GridPane.setConstraints(addButton, 1, 7);
+        GridPane.setConstraints(active, 0, 7);   
+        GridPane.setConstraints(toggleActive, 1, 7);       
+        
+        GridPane.setConstraints(addButton, 1, 8);
         
         // Add values to grid
         grid.getChildren().addAll(
                 name, address, address2, city, postal, country, phone,
-                nameInput, addressInput, address2Input, cityInput, postalInput, countryInput, phoneInput, addButton
+                nameInput, addressInput, address2Input, cityInput, postalInput, countryInput, phoneInput, addButton,
+                toggleActive, active
         );
         
         grid.setAlignment( Pos.CENTER );
@@ -282,6 +302,7 @@ public class Customer_CRUD {
         Label postal = new Label("Postal");
         Label country = new Label("Country");
         Label phone = new Label("Phone");
+        Label active = new Label("Customer State: ");
         
         // field inputs
         TextField nameInput = new TextField( customer.getCustomerName() );
@@ -297,12 +318,31 @@ public class Customer_CRUD {
         updateButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
         updateButton.setMinWidth(200);
         
+        ToggleButton toggleActive = new ToggleButton("Active");
+        
+        System.out.println(customer.getActive());
+        
+        if ("1".equals(customer.getActive())) {
+            toggleActive.setSelected(true);
+        } else {
+            toggleActive.setSelected(false);
+        };
+        
+        
         updateButton.setOnAction(e -> {
+            
+            String activeState;
+            
+            if (toggleActive.selectedProperty().get()) {
+                activeState = "1";
+            } else {
+                activeState = "0";
+            };
                    
             apiDB.updateCustomer(
                     customer.getCustomerId(),
                     nameInput.getText(),
-                    "1",
+                    activeState,
                     addressInput.getText(),
                     address2Input.getText(),
                     postalInput.getText(),
@@ -340,12 +380,16 @@ public class Customer_CRUD {
         GridPane.setConstraints(phone, 0, 6);
         GridPane.setConstraints(phoneInput, 1, 6);
         
-        GridPane.setConstraints(updateButton, 1, 7);
+        GridPane.setConstraints(active, 0, 7);   
+        GridPane.setConstraints(toggleActive, 1, 7);       
+        
+        GridPane.setConstraints(updateButton, 1, 8);
         
         // Add values to grid
         grid.getChildren().addAll(
                 name, address, address2, city, postal, country, phone,
-                nameInput, addressInput, address2Input, cityInput, postalInput, countryInput, phoneInput, updateButton
+                nameInput, addressInput, address2Input, cityInput, postalInput, countryInput, phoneInput, updateButton,
+                active, toggleActive
         );
         
         grid.setAlignment( Pos.CENTER );

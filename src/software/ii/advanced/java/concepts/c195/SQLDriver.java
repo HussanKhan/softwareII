@@ -302,6 +302,7 @@ public class SQLDriver {
                 
                 tempCustomer.setCustomerId(result.getString("customerId"));
                 tempCustomer.setCustomerName(result.getString("customerName"));
+                tempCustomer.setActive(result.getString("active"));
                 
                 // Temp store address ID
                 tempCustomer.setAddress(result.getString("addressId"));
@@ -348,7 +349,9 @@ public class SQLDriver {
             
             String addressId = result.getString("addressId");
             
+            // delete address first
             statement.executeUpdate(String.format("DELETE FROM customer WHERE customerId = '%s';", id));
+            // delete address
             statement.executeUpdate(String.format("DELETE FROM address WHERE addressId = '%s';", addressId));
 
         } catch (Exception err) {
@@ -369,8 +372,21 @@ public class SQLDriver {
             String username
     ) {
         try {
-            // 
-            statement.executeUpdate(String.format("DELETE FROM customer WHERE customerId = '%s';", id));  
+            // first delete old
+            deleteCustomer( Integer.parseInt(id) );
+            // add new entry
+                    // Add Customer
+            setCustomer(
+                customerName,
+                active,
+                address, 
+                address2,
+                postal, 
+                phone,
+                city,
+                country,
+                username
+            );
         } catch (Exception err) {
             System.out.println(err);
         };
