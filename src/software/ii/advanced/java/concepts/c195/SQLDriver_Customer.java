@@ -13,7 +13,7 @@ import javafx.collections.ObservableList;
  *
  * @author "Hussan Khan"
  */
-public class SQLDriver {
+public class SQLDriver_Customer {
     
     // figure out add customer
     // add items from backwards
@@ -31,7 +31,7 @@ public class SQLDriver {
     private Statement statement;
     
     // Establish connection at init
-    public SQLDriver() {
+    public SQLDriver_Customer() {
         
         try {
             connection = DriverManager.getConnection(databaseURL, username, password);
@@ -432,26 +432,6 @@ public class SQLDriver {
     };
         
     
-    public void viewCity() {
-        
-        try {
-            
-            ResultSet result = statement.executeQuery("SELECT * FROM address;");
-            
-            while (result.next()) {
-                 // name of column
-                 System.out.println(result.getString(1));
-                 System.out.println(result.getString(2));
-                 System.out.println(result.getString(3));
-                 System.out.println(result.getString(4));
-                 System.out.println(result.getString(5));
-             };
-             
-        } catch (Exception err) {};
-            
-    };
-    
-    
     // Check login creds
     public int login(String userName, String passwordUser) {
         
@@ -470,76 +450,6 @@ public class SQLDriver {
         };
         
         return queryState;
-    };
-    
-    
-    public void getData() {
-        
-        // Connect to DB
-        try {
-            
-            Connection conn = DriverManager.getConnection(databaseURL, username, password);
-             
-             // QUERY
-             Statement statement = conn.createStatement();
-             // EXECUTE
-             ResultSet result = statement.executeQuery("SELECT * FROM city;");
-            // INSERT
-//                int result = statement.executeUpdate("INSERT INTO user (userName, password, active, createDate, createdBy, lastUpdateBy) VALUES ('test', 'password', 1, NOW(), 'admin', 'admin')");
-                  //System.out.println(result);
-//           
-            //System.out.println(result.getAsciiStream("TABLE_NAMES"));
-             // PROCESS RESULT
-             while (result.next()) {
-                 // name of column
-                 int numCol = result.getMetaData().getColumnCount();
-                 
-                 for (int i = 1; i < numCol + 1; i++) {
-                     System.out.println(result.getMetaData().getColumnName(i));
-                 };
-                 
-             };
-            
-        
-        } catch (Exception exc) {
-            System.out.println(exc);
-        };
-
-    };
-    
-    // CUSTOMER DB HANDLING
-    public int addCustomer(){
-        
-        int success = 0;
-        
-        try {
-            success = statement.executeUpdate("INSERT INTO customer (customerName, password, active, createDate, createdBy, lastUpdateBy) VALUES ('test', 'password', 1, NOW(), 'admin', 'admin')");
-        } catch (Exception err) {
-            System.out.println(err);
-        };
-        
-        return success;
-    };
-    
-    public int updateCustomer(){
-        return 0;
-    };
-    
-    public int deleteCustomer(){
-        return 0;
-    };
-    
-    // APPOINTMENT DB HANDLING
-    public int addAppointment(){
-        return 0;
-    };
-    
-    public int updateAppointment(){
-        return 0;
-    };
-    
-    public int deleteAppointment(){
-        return 0;
     };
     
 }

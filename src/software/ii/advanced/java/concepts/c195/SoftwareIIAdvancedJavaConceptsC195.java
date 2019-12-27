@@ -28,7 +28,7 @@ import javafx.stage.Stage;
 public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
     
     private Locale locale = Locale.getDefault();
-    private SQLDriver apiDB = new SQLDriver();
+    private SQLDriver_Customer apiDB = new SQLDriver_Customer();
     
     private String langCode = "es";
     private String countryCode = "US";
@@ -39,10 +39,6 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         
         langCode = new LanguageWindow().displayLangWindow();
         
-        // customer data
-        ObservableList<Customer> temp = apiDB.getAllCustomers();
-        
-
         // HEADER
         Label sceneHeader = new Label( getLangKey(langCode, countryCode, "promptCat") );
         sceneHeader.setStyle("-fx-font-weight: bold");

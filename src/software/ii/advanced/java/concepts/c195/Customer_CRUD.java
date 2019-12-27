@@ -30,7 +30,7 @@ public class Customer_CRUD {
     
     private Scene lastScene;
     private Stage lastStage;
-    private SQLDriver apiDB = new SQLDriver();
+    private SQLDriver_Customer apiDB = new SQLDriver_Customer();
     private String username;
     
     TableView<Customer> customerTable;
