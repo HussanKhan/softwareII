@@ -7,6 +7,7 @@ package software.ii.advanced.java.concepts.c195;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
 
 /**
@@ -35,6 +36,31 @@ public class SQLDriver_Appointment {
         };
     };
     
+    // returns all data from result set
+    private void printAllData(ResultSet result) {
+        
+        try {
+        
+            int colNumbers = result.getMetaData().getColumnCount() + 1;
+            
+            System.out.println("---------------------------------------------------------------------------------------");
+            
+            while (result.next()) {
+                
+                for (int i = 1; i < colNumbers; i++) {
+                    
+                    System.out.println(result.getMetaData().getColumnName(i) + ": " + result.getString(i));
+                
+                };
+                
+                System.out.println("---------------------------------------------------------------------------------------");
+             };
+             
+        } catch (Exception err) {};
+        
+    };
+    
+    //
     
 
 }
