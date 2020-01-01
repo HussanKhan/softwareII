@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -60,7 +62,80 @@ public class SQLDriver_Appointment {
         
     };
     
-    //
+    // Add appointment
+    public void addAppointment(
+            String customerId,
+            String title,
+            String description,
+            String location,
+            String contact,
+            String type,
+            String url,
+            String start,
+            String end,
+            String username
+    ){
+        String command;
+        // '2007-01-01 10:00:00' date store
+        try {
+             command = String.format("INSERT INTO appointment "
+                     + "(customerId, userId, title, description, location, contact, type, url, start, end, createDate, createdBy, lastUpdateBy) "
+                     + "VALUES ( (SELECT customerId FROM customer WHERE customerId = '%s') , (SELECT userId FROM user WHERE username = '%s'), '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW(), '%s', '%s');"
+                     , customerId, username, title, description, location, contact, type, url, start, end, username, username );
+             statement.executeUpdate(command);
+        
+        } catch (Exception exc) {
+            System.out.println(exc);
+        };
+        
+    };
+    
+    // delete appointment
+    public void deleteAppointment(String id) {
+        
+        try {
+            statement.executeUpdate(String.format("DELETE FROM appointment WHERE appointmentId = '%s';", id));
+        } catch (Exception exc) {
+            System.out.println(exc);
+        };
+        
+    };
+    
+    // get all Appointments
+    public ObservableList<Appointment> getAllAppointments(){
+    
+        ObservableList<Appointment> matches = FXCollections.observableArrayList();
+        
+        try {
+            ResultSet result = statement.executeQuery("SELECT * FROM appointment;");
+            
+            while (result.next()) {
+                
+                Appointment tempAppoint = new Appointment();
+                
+                tempAppoint.setId(result.getString("appointmentId"));
+                tempAppoint.setCustomerId(result.getString("customerId"));
+                tempAppoint.setUserId(result.getString("userId"));
+                tempAppoint.setTitle(result.getString("title"));
+                tempAppoint.setDescription(result.getString("description"));
+                tempAppoint.setLocation(result.getString("location"));
+                tempAppoint.setContact(result.getString("contact"));
+                tempAppoint.setType(result.getString("type"));
+                tempAppoint.setUrl(result.getString("url"));
+                tempAppoint.setStart(result.getString("start"));
+                tempAppoint.setEnd(result.getString("end"));
+                
+                matches.add(tempAppoint);
+                
+            };
+                        
+        } catch (Exception err) {
+            System.out.println(err);
+        };
+            
+       return matches;
+        
+    };
     
 
 }
