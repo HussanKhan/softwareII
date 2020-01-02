@@ -5,9 +5,15 @@
  */
 package software.ii.advanced.java.concepts.c195;
 
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.TimeZone;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -46,10 +52,10 @@ public class Appointments_CRUD {
         TableColumn<Appointment, String> id = new TableColumn<>("ID");
         id.setCellValueFactory(new PropertyValueFactory<>("id"));
         
-        TableColumn<Appointment, String> start = new TableColumn<>("Start");
+        TableColumn<Appointment, String> start = new TableColumn<>("Start Customer Timezone");
         start.setCellValueFactory(new PropertyValueFactory<>("start"));
         
-        TableColumn<Appointment, String> end = new TableColumn<>("End");
+        TableColumn<Appointment, String> end = new TableColumn<>("End Customer Timezone");
         end.setCellValueFactory(new PropertyValueFactory<>("end"));       
         
         TableColumn<Appointment, String> type = new TableColumn<>("Type");
@@ -124,7 +130,7 @@ public class Appointments_CRUD {
         Button updateButton = createButton("UPDATE");
         updateButton.setOnAction(e -> {
             
-//           updateCustomer(selectedAppointment);
+            updateAppointment(selectedAppointment);
            
         });
 
@@ -156,7 +162,22 @@ public class Appointments_CRUD {
         return backButton;
     };
     
-    public void addAppointment() {
+    public int addAppointment() {
+        
+        // date info
+        Date date = new Date();
+        SimpleDateFormat formattedDate = new SimpleDateFormat("MM-dd-yy:HH:mm:SS Z");
+        
+        String dateTime = formattedDate.format(date);
+        System.out.println(dateTime);
+        
+        String[] data = TimeZone.getAvailableIDs();
+        
+        for (String temp : data) {
+            System.out.println(temp);
+        };
+        
+        
         // set stage - window
         Stage window = new Stage();
         
@@ -180,19 +201,27 @@ public class Appointments_CRUD {
         // Opens customer selection window
         selectCustomer();
         
+        // close if not selected
+        if ( selectedCustomer == null ) {
+            window.close();
+            return 0;
+        };
+        
         // field inputs
         TextField customerIdInput = new TextField( selectedCustomer.getCustomerId() );
         TextField titleInput = new TextField();
         TextField descriptionInput = new TextField();
-        TextField locationInput = new TextField( selectedCustomer.getCity() );
+        TextField locationInput = new TextField( selectedCustomer.getCity() + ", " + selectedCustomer.getCountry() );
         TextField contactInput = new TextField( selectedCustomer.getPhone() );
         TextField typeInput = new TextField();
         TextField urlInput = new TextField();
-        TextField startInput = new TextField();
-        TextField endInput = new TextField();
+        
+        // Date picker
+        DatePicker startDatePicker = new DatePicker();
+        DatePicker endDatePicker = new DatePicker();
         
         // Add Button
-        Button addButton = new Button("Add Appointment");
+        Button addButton = new Button("Update Appointment");
         addButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
         addButton.setMinWidth(200);
         
@@ -241,10 +270,10 @@ public class Appointments_CRUD {
         GridPane.setConstraints(urlInput, 1, 6);
         
         GridPane.setConstraints(start, 0, 7);   
-        GridPane.setConstraints(startInput, 1, 7);       
+        GridPane.setConstraints(startDatePicker, 1, 7);       
         
         GridPane.setConstraints(end, 0, 8);   
-        GridPane.setConstraints(endInput, 1, 8);       
+        GridPane.setConstraints(endDatePicker, 1, 8);       
         
         GridPane.setConstraints(addButton, 1, 9);
         
@@ -266,9 +295,149 @@ public class Appointments_CRUD {
         contactInput,
         typeInput,
         urlInput,
+        startDatePicker,
+        endDatePicker,
+        addButton
+                
+        );
+        
+        grid.setAlignment( Pos.CENTER );
+        
+        // layout - add objects
+        VBox layout = new VBox(20);
+        layout.getChildren().addAll(grid);
+        layout.setAlignment(Pos.CENTER); // CENTER EVERYTHING
+        layout.setPadding(new javafx.geometry.Insets(20,20,20,20));
+        
+        // scene - add layout to scene
+        Scene scene = new Scene(layout);
+        
+        // store empty
+        selectedCustomer = null;
+        
+        // don;t allow user to click anything else until they deal with window
+        window.initModality(Modality.APPLICATION_MODAL);
+        window.setTitle("Update Appointment");
+        window.setMinWidth(250); // 250px min width
+        window.setScene(scene);
+        window.showAndWait(); // special way to show, and wait for close to reurn to caller
+        
+        return 0;
+    };
+    
+    
+    public void updateAppointment(Appointment appointment) {
+        
+        // set stage - window
+        Stage window = new Stage();
+        
+        // Layout
+        GridPane grid = new GridPane(); // content all the way tot he edge of the screen
+        grid.setPadding(new javafx.geometry.Insets(20, 20, 20, 20)); // border padding
+        grid.setVgap(30); // spacing bewteen all objects
+        grid.setHgap(30); // spacing bewteen all objects
+        
+        // field titles
+        Label customerId = new Label("Customer ID");
+        Label title = new Label("Title");
+        Label description = new Label("Description");
+        Label location = new Label("Location");
+        Label contact = new Label("Contact");
+        Label type = new Label("Type");
+        Label url = new Label("URL");
+        Label start = new Label("Start");
+        Label end = new Label("End");
+        
+        // field inputs
+        TextField customerIdInput = new TextField( appointment.getCustomerId() );
+        TextField titleInput = new TextField( appointment.getTitle() );
+        TextField descriptionInput = new TextField( appointment.getDescription() );
+        TextField locationInput = new TextField( appointment.getLocation() );
+        TextField contactInput = new TextField( appointment.getContact() );
+        TextField typeInput = new TextField( appointment.getType() );
+        TextField urlInput = new TextField( appointment.getUrl() );
+        TextField startInput = new TextField( appointment.getStart() );
+        TextField endInput = new TextField( appointment.getEnd() );
+        
+        // Add Button
+        Button updateButton = new Button("Update Appointment");
+        updateButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+        updateButton.setMinWidth(200);
+        
+        updateButton.setOnAction(e -> {
+            
+        apiDB.deleteAppointment(appointment.getId());
+            
+        apiDB.addAppointment(
+                customerIdInput.getText(),
+                titleInput.getText(),
+                descriptionInput.getText(),
+                locationInput.getText(),
+                contactInput.getText(),
+                typeInput.getText(),
+                urlInput.getText(),
+                "2019-12-30 12:00:00",
+                "2019-12-30 01:00:00",
+                username
+        );
+        
+        appointmentTable.setItems(apiDB.getAllAppointments());
+                     
+        window.close();
+        
+        });
+        
+        // Mappings
+        GridPane.setConstraints(customerId, 0, 0);
+        GridPane.setConstraints(customerIdInput, 1, 0);
+        
+        GridPane.setConstraints(title, 0, 1);
+        GridPane.setConstraints(titleInput, 1, 1);
+        
+        GridPane.setConstraints(description, 0, 2);
+        GridPane.setConstraints(descriptionInput, 1, 2);
+        
+        GridPane.setConstraints(location, 0, 3);
+        GridPane.setConstraints(locationInput, 1, 3);
+        
+        GridPane.setConstraints(contact, 0, 4);
+        GridPane.setConstraints(contactInput, 1, 4);
+        
+        GridPane.setConstraints(type, 0, 5);
+        GridPane.setConstraints(typeInput, 1, 5);
+        
+        GridPane.setConstraints(url, 0, 6);
+        GridPane.setConstraints(urlInput, 1, 6);
+        
+        GridPane.setConstraints(start, 0, 7);   
+        GridPane.setConstraints(startInput, 1, 7);       
+        
+        GridPane.setConstraints(end, 0, 8);   
+        GridPane.setConstraints(endInput, 1, 8);       
+        
+        GridPane.setConstraints(updateButton, 1, 9);
+        
+        // Add values to grid
+        grid.getChildren().addAll(
+        customerId,
+        title,
+        description,
+        location,
+        contact,
+        type,
+        url,
+        start,
+        end,
+        customerIdInput,
+        titleInput,
+        descriptionInput,
+        locationInput,
+        contactInput,
+        typeInput,
+        urlInput,
         startInput,
         endInput,
-        addButton
+        updateButton
                 
         );
         
@@ -286,134 +455,6 @@ public class Appointments_CRUD {
         // don;t allow user to click anything else until they deal with window
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle("Add Appointment");
-        window.setMinWidth(250); // 250px min width
-        window.setScene(scene);
-        window.showAndWait(); // special way to show, and wait for close to reurn to caller
-    };
-    
-    
-    public void updateCustomer(Customer customer) {
-        // set stage - window
-        Stage window = new Stage();
-        
-        // Layout
-        GridPane grid = new GridPane(); // content all the way tot he edge of the screen
-        grid.setPadding(new javafx.geometry.Insets(20, 20, 20, 20)); // border padding
-        grid.setVgap(30); // spacing bewteen all objects
-        grid.setHgap(30); // spacing bewteen all objects
-        
-        // field titles
-        Label name = new Label("Name");
-        Label address = new Label("Address");
-        Label address2 = new Label("Address 2");
-        Label city = new Label("City");
-        Label postal = new Label("Postal");
-        Label country = new Label("Country");
-        Label phone = new Label("Phone");
-        Label active = new Label("Customer State: ");
-        
-        // field inputs
-        TextField nameInput = new TextField( customer.getCustomerName() );
-        TextField addressInput = new TextField( customer.getAddress() );
-        TextField address2Input = new TextField( customer.getAddress2() );
-        TextField cityInput = new TextField( customer.getCity() );
-        TextField postalInput = new TextField( customer.getPostal() );
-        TextField countryInput = new TextField( customer.getCountry() );
-        TextField phoneInput = new TextField( customer.getPhone() );
-        
-        // Add Button
-        Button updateButton = new Button("Update Customer");
-        updateButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
-        updateButton.setMinWidth(200);
-        
-        ToggleButton toggleActive = new ToggleButton("Active");
-        
-        System.out.println(customer.getActive());
-        
-        if ("1".equals(customer.getActive())) {
-            toggleActive.setSelected(true);
-        } else {
-            toggleActive.setSelected(false);
-        };
-        
-        
-        updateButton.setOnAction(e -> {
-            
-            String activeState;
-            
-            if (toggleActive.selectedProperty().get()) {
-                activeState = "1";
-            } else {
-                activeState = "0";
-            };
-                   
-//            apiDB.updateCustomer(
-//                    customer.getCustomerId(),
-//                    nameInput.getText(),
-//                    activeState,
-//                    addressInput.getText(),
-//                    address2Input.getText(),
-//                    postalInput.getText(),
-//                    phoneInput.getText(),
-//                    cityInput.getText(),
-//                    countryInput.getText(),
-//                    username
-//            );
-//            
-//            customerTable.setItems(apiDB.getAllCustomers());
-            
-            window.close();
-     
-        });
-        
-        // Mappings
-        GridPane.setConstraints(name, 0, 0);
-        GridPane.setConstraints(nameInput, 1, 0);
-        
-        GridPane.setConstraints(address, 0, 1);
-        GridPane.setConstraints(addressInput, 1, 1);
-        
-        GridPane.setConstraints(address2, 0, 2);
-        GridPane.setConstraints(address2Input, 1, 2);
-        
-        GridPane.setConstraints(city, 0, 3);
-        GridPane.setConstraints(cityInput, 1, 3);
-        
-        GridPane.setConstraints(postal, 0, 4);
-        GridPane.setConstraints(postalInput, 1, 4);
-        
-        GridPane.setConstraints(country, 0, 5);
-        GridPane.setConstraints(countryInput, 1, 5);
-        
-        GridPane.setConstraints(phone, 0, 6);
-        GridPane.setConstraints(phoneInput, 1, 6);
-        
-        GridPane.setConstraints(active, 0, 7);   
-        GridPane.setConstraints(toggleActive, 1, 7);       
-        
-        GridPane.setConstraints(updateButton, 1, 8);
-        
-        // Add values to grid
-        grid.getChildren().addAll(
-                name, address, address2, city, postal, country, phone,
-                nameInput, addressInput, address2Input, cityInput, postalInput, countryInput, phoneInput, updateButton,
-                active, toggleActive
-        );
-        
-        grid.setAlignment( Pos.CENTER );
-        
-        // layout - add objects
-        VBox layout = new VBox(20);
-        layout.getChildren().addAll(grid);
-        layout.setAlignment(Pos.CENTER); // CENTER EVERYTHING
-        layout.setPadding(new javafx.geometry.Insets(20,20,20,20));
-        
-        // scene - add layout to scene
-        Scene scene = new Scene(layout);
-
-        // don;t allow user to click anything else until they deal with window
-        window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("Update Customer");
         window.setMinWidth(250); // 250px min width
         window.setScene(scene);
         window.showAndWait(); // special way to show, and wait for close to reurn to caller
