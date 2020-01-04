@@ -9,10 +9,12 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -172,11 +174,7 @@ public class Appointments_CRUD {
         System.out.println(dateTime);
         
         String[] data = TimeZone.getAvailableIDs();
-        
-        for (String temp : data) {
-            System.out.println(temp);
-        };
-        
+
         
         // set stage - window
         Stage window = new Stage();
@@ -195,8 +193,59 @@ public class Appointments_CRUD {
         Label contact = new Label("Contact");
         Label type = new Label("Type");
         Label url = new Label("URL");
-        Label start = new Label("Start");
-        Label end = new Label("End");
+        Label start = new Label("Start Date");
+        Label end = new Label("End Date");
+        
+        Label startTime = new Label("Start Time");
+        Label endTime = new Label("End Time");
+        
+        // Time picker
+        ObservableList<String> hour = 
+        FXCollections.observableArrayList(
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12"
+        );
+        
+        ObservableList<String> minute = 
+        FXCollections.observableArrayList(
+            "00",
+            "10",
+            "20",
+            "30",
+            "40",
+            "50"
+        );
+        
+        ObservableList<String> ampm = 
+        FXCollections.observableArrayList(
+            "AM",
+            "PM"
+        );
+        
+        // combo boxes
+        ComboBox hourComboBoxStart = new ComboBox(hour);
+        ComboBox minuteComboBoxStart = new ComboBox(minute);
+        ComboBox ampmComboBoxStart = new ComboBox(ampm);
+        
+        ComboBox hourComboBoxEnd = new ComboBox(hour);
+        ComboBox minuteComboBoxEnd = new ComboBox(minute);
+        ComboBox ampmComboBoxEnd = new ComboBox(ampm);
+        
+        HBox timeMenuStart = new HBox(5);
+        HBox timeMenuEnd = new HBox(5);
+        
+        timeMenuStart.getChildren().addAll(hourComboBoxStart, minuteComboBoxStart, ampmComboBoxStart);
+        timeMenuEnd.getChildren().addAll(hourComboBoxEnd, minuteComboBoxEnd, ampmComboBoxEnd);
         
         // Opens customer selection window
         selectCustomer();
@@ -206,6 +255,17 @@ public class Appointments_CRUD {
             window.close();
             return 0;
         };
+        
+                
+        String customerCity = selectedCustomer.getCity();
+        
+        for (String temp : data) {
+            
+            if ( temp.toLowerCase().contains(customerCity.toLowerCase()) ) {
+                System.out.println(temp);
+            };  
+        };
+        
         
         // field inputs
         TextField customerIdInput = new TextField( selectedCustomer.getCustomerId() );
@@ -270,12 +330,18 @@ public class Appointments_CRUD {
         GridPane.setConstraints(urlInput, 1, 6);
         
         GridPane.setConstraints(start, 0, 7);   
-        GridPane.setConstraints(startDatePicker, 1, 7);       
+        GridPane.setConstraints(startDatePicker, 1, 7);
         
-        GridPane.setConstraints(end, 0, 8);   
-        GridPane.setConstraints(endDatePicker, 1, 8);       
+        GridPane.setConstraints(startTime, 0, 8); 
+        GridPane.setConstraints(timeMenuStart, 1, 8); 
         
-        GridPane.setConstraints(addButton, 1, 9);
+        GridPane.setConstraints(end, 0, 9);   
+        GridPane.setConstraints(endDatePicker, 1, 9);
+        
+        GridPane.setConstraints(endTime, 0, 10); 
+        GridPane.setConstraints(timeMenuEnd, 1, 10); 
+        
+        GridPane.setConstraints(addButton, 1, 11);
         
         // Add values to grid
         grid.getChildren().addAll(
@@ -288,6 +354,10 @@ public class Appointments_CRUD {
         url,
         start,
         end,
+        startTime,
+        endTime,
+        timeMenuStart,
+        timeMenuEnd,
         customerIdInput,
         titleInput,
         descriptionInput,
