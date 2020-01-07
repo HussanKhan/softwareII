@@ -287,6 +287,48 @@ public class SQLDriver_Customer {
         
     };
     
+    public Customer getCustomer(String id) {
+        
+        Customer tempCustomer = new Customer();
+    
+        try {
+            ResultSet result = statement.executeQuery(String.format("SELECT * FROM customer WHERE customerId = '%s';", id));  
+            result.next();
+            
+            tempCustomer.setCustomerId(result.getString("customerId"));
+            tempCustomer.setCustomerName(result.getString("customerName"));
+            tempCustomer.setActive(result.getString("active"));
+                
+            // Temp store address ID
+            tempCustomer.setAddress(result.getString("addressId"));
+            
+            ResultSet addressData = getAddress(tempCustomer.getAddress());
+            addressData.next();
+                
+            tempCustomer.setAddress(addressData.getString("address"));
+            tempCustomer.setAddress2(addressData.getString("address2"));
+            tempCustomer.setPostal(addressData.getString("postalCode"));
+            tempCustomer.setPhone(addressData.getString("phone"));
+                
+            ResultSet cityData = getCity(addressData.getString("cityId"));
+            cityData.next();
+                
+            tempCustomer.setCity(cityData.getString("city"));
+                
+            ResultSet countryData = getCountry(cityData.getString("countryId"));
+            countryData.next();
+                
+            tempCustomer.setCountry(countryData.getString("country"));
+          
+            
+        } catch (Exception err) {
+            System.out.println(err);
+        };
+        
+        return tempCustomer;
+    
+    };
+    
     // make fucniton that gets address info based on addressId
     
     public ObservableList<Customer> getAllCustomers(){

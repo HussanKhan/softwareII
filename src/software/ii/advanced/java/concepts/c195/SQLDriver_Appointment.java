@@ -131,6 +131,7 @@ public class SQLDriver_Appointment {
                         
         } catch (Exception err) {
             System.out.println(err);
+            System.out.println("from api");
         };
             
        return matches;

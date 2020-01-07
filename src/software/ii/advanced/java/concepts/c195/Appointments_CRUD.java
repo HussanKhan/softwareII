@@ -6,7 +6,6 @@
 package software.ii.advanced.java.concepts.c195;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
 import javafx.collections.FXCollections;
@@ -16,11 +15,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -28,6 +27,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import static jdk.nashorn.internal.objects.NativeMath.random;
 
 /**
  *
@@ -66,7 +66,7 @@ public class Appointments_CRUD {
         TableColumn<Appointment, String> title = new TableColumn<>("Title");
         title.setCellValueFactory(new PropertyValueFactory<>("title"));
         
-        TableColumn<Appointment, String> link = new TableColumn<>("Link");
+        TableColumn<Appointment, Hyperlink> link = new TableColumn<>("Link");
         link.setCellValueFactory(new PropertyValueFactory<>("url"));
         
         // Init Table
@@ -266,7 +266,6 @@ public class Appointments_CRUD {
             };  
         };
         
-        
         // field inputs
         TextField customerIdInput = new TextField( selectedCustomer.getCustomerId() );
         TextField titleInput = new TextField();
@@ -274,7 +273,20 @@ public class Appointments_CRUD {
         TextField locationInput = new TextField( selectedCustomer.getCity() + ", " + selectedCustomer.getCountry() );
         TextField contactInput = new TextField( selectedCustomer.getPhone() );
         TextField typeInput = new TextField();
-        TextField urlInput = new TextField();
+       
+        // make url for user
+        String importantValues = selectedCustomer.getCustomerId() + selectedCustomer.getCustomerName() + selectedCustomer.getCity() + selectedCustomer.getCountry() + selectedCustomer.getPhone();
+        importantValues = importantValues.replaceAll("\\s+","");
+        
+        String cusUrl = "https://appoint.com/";
+        
+        int max = importantValues.length() - 1;
+        
+        for (int i = 0; i < 20; i++) {
+            cusUrl += importantValues.charAt((int) ((Math.random() * ((max - 0) + 1)) + 0));
+        };
+        
+        TextField urlInput = new TextField( cusUrl );
         
         // Date picker
         DatePicker startDatePicker = new DatePicker();
@@ -287,7 +299,6 @@ public class Appointments_CRUD {
         
         addButton.setOnAction(e -> {
            
-            
         apiDB.addAppointment(
                 customerIdInput.getText(),
                 titleInput.getText(),
@@ -367,8 +378,7 @@ public class Appointments_CRUD {
         urlInput,
         startDatePicker,
         endDatePicker,
-        addButton
-                
+        addButton 
         );
         
         grid.setAlignment( Pos.CENTER );
@@ -425,7 +435,7 @@ public class Appointments_CRUD {
         TextField locationInput = new TextField( appointment.getLocation() );
         TextField contactInput = new TextField( appointment.getContact() );
         TextField typeInput = new TextField( appointment.getType() );
-        TextField urlInput = new TextField( appointment.getUrl() );
+        Hyperlink urlInput = appointment.getUrl();
         TextField startInput = new TextField( appointment.getStart() );
         TextField endInput = new TextField( appointment.getEnd() );
         
