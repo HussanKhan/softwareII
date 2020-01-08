@@ -6,6 +6,7 @@
 package software.ii.advanced.java.concepts.c195;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.TimeZone;
 import javafx.collections.FXCollections;
@@ -165,19 +166,18 @@ public class Appointments_CRUD {
     };
     
     public int addAppointment() {
-        
-        // date info
-        Date date = new Date();
-        SimpleDateFormat formattedDate = new SimpleDateFormat("MM-dd-yy:HH:mm:SS Z");
-        
-        String dateTime = formattedDate.format(date);
-        System.out.println(dateTime);
-        
-        String[] data = TimeZone.getAvailableIDs();
-
-        
+                
         // set stage - window
         Stage window = new Stage();
+        
+        // Opens customer selection window
+        selectCustomer();
+        
+        // close if customer not selected
+        if ( selectedCustomer == null ) {
+            window.close();
+            return 0;
+        };
         
         // Layout
         GridPane grid = new GridPane(); // content all the way tot he edge of the screen
@@ -193,6 +193,9 @@ public class Appointments_CRUD {
         Label contact = new Label("Contact");
         Label type = new Label("Type");
         Label url = new Label("URL");
+        
+        Label zone = new Label("Timezone/Time of Day");
+        
         Label start = new Label("Start Date");
         Label end = new Label("End Date");
         
@@ -232,39 +235,43 @@ public class Appointments_CRUD {
             "PM"
         );
         
+        ObservableList<String> timeZones = FXCollections.observableArrayList();
+        
+        // Build timezones list
+        String[] data = TimeZone.getAvailableIDs();
+        
+        for (String temp : data) {
+            timeZones.add(temp);
+        };
+               
         // combo boxes
         ComboBox hourComboBoxStart = new ComboBox(hour);
         ComboBox minuteComboBoxStart = new ComboBox(minute);
-        ComboBox ampmComboBoxStart = new ComboBox(ampm);
+        ComboBox ampmComboBox = new ComboBox(ampm);
+        
+        ComboBox customerTimeZone = new ComboBox(timeZones);
         
         ComboBox hourComboBoxEnd = new ComboBox(hour);
         ComboBox minuteComboBoxEnd = new ComboBox(minute);
-        ComboBox ampmComboBoxEnd = new ComboBox(ampm);
+        
+        // Make default timzezone selection based on customer address
+        
+        String customerCity = selectedCustomer.getCity();
+        
+        for (int i = 0; i < timeZones.size(); i++) {
+            
+            if (timeZones.get(i).toLowerCase().contains(customerCity.toLowerCase())) {
+                customerTimeZone.getSelectionModel().select(i);
+                break;
+            };
+      
+        };
         
         HBox timeMenuStart = new HBox(5);
         HBox timeMenuEnd = new HBox(5);
         
-        timeMenuStart.getChildren().addAll(hourComboBoxStart, minuteComboBoxStart, ampmComboBoxStart);
-        timeMenuEnd.getChildren().addAll(hourComboBoxEnd, minuteComboBoxEnd, ampmComboBoxEnd);
-        
-        // Opens customer selection window
-        selectCustomer();
-        
-        // close if not selected
-        if ( selectedCustomer == null ) {
-            window.close();
-            return 0;
-        };
-        
-                
-        String customerCity = selectedCustomer.getCity();
-        
-        for (String temp : data) {
-            
-            if ( temp.toLowerCase().contains(customerCity.toLowerCase()) ) {
-                System.out.println(temp);
-            };  
-        };
+        timeMenuStart.getChildren().addAll(hourComboBoxStart, minuteComboBoxStart);
+        timeMenuEnd.getChildren().addAll(hourComboBoxEnd, minuteComboBoxEnd);
         
         // field inputs
         TextField customerIdInput = new TextField( selectedCustomer.getCustomerId() );
@@ -293,11 +300,29 @@ public class Appointments_CRUD {
         DatePicker endDatePicker = new DatePicker();
         
         // Add Button
-        Button addButton = new Button("Update Appointment");
+        Button addButton = new Button("Add Appointment");
         addButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
         addButton.setMinWidth(200);
         
         addButton.setOnAction(e -> {
+            
+        // Extract start time and date
+        String startData = startDatePicker.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        System.out.println(startData);
+        String userHour = "";
+        if ("PM".equals(ampmComboBox.getSelectionModel().getSelectedItem().toString())) {
+            
+            int tempHour = Integer.parseInt(hourComboBoxStart.getSelectionModel().getSelectedItem().toString());
+            
+            tempHour = tempHour + 12;
+            
+            userHour = Integer.toString(tempHour);
+            
+        } else {
+            userHour = hourComboBoxStart.getSelectionModel().getSelectedItem().toString();
+        };
+        
+        String startTimeUser = String.format("%s %s:%s:00", startData, userHour, minuteComboBoxStart.getSelectionModel().getSelectedItem().toString());
            
         apiDB.addAppointment(
                 customerIdInput.getText(),
@@ -307,7 +332,7 @@ public class Appointments_CRUD {
                 contactInput.getText(),
                 typeInput.getText(),
                 urlInput.getText(),
-                "2019-12-30 12:00:00",
+                startTimeUser,
                 "2019-12-30 01:00:00",
                 username
         );
@@ -340,19 +365,23 @@ public class Appointments_CRUD {
         GridPane.setConstraints(url, 0, 6);
         GridPane.setConstraints(urlInput, 1, 6);
         
-        GridPane.setConstraints(start, 0, 7);   
-        GridPane.setConstraints(startDatePicker, 1, 7);
+        GridPane.setConstraints(zone, 0, 7);
+        GridPane.setConstraints(customerTimeZone, 1, 7);
+        GridPane.setConstraints(ampmComboBox, 2, 7);
         
-        GridPane.setConstraints(startTime, 0, 8); 
-        GridPane.setConstraints(timeMenuStart, 1, 8); 
+        GridPane.setConstraints(start, 0, 8);   
+        GridPane.setConstraints(startDatePicker, 1, 8);
         
-        GridPane.setConstraints(end, 0, 9);   
-        GridPane.setConstraints(endDatePicker, 1, 9);
+        GridPane.setConstraints(startTime, 0, 9); 
+        GridPane.setConstraints(timeMenuStart, 1, 9); 
         
-        GridPane.setConstraints(endTime, 0, 10); 
-        GridPane.setConstraints(timeMenuEnd, 1, 10); 
+        GridPane.setConstraints(end, 0, 10);   
+        GridPane.setConstraints(endDatePicker, 1, 10);
         
-        GridPane.setConstraints(addButton, 1, 11);
+        GridPane.setConstraints(endTime, 0, 11); 
+        GridPane.setConstraints(timeMenuEnd, 1, 11); 
+        
+        GridPane.setConstraints(addButton, 1, 12);
         
         // Add values to grid
         grid.getChildren().addAll(
@@ -369,6 +398,9 @@ public class Appointments_CRUD {
         endTime,
         timeMenuStart,
         timeMenuEnd,
+        zone,
+        customerTimeZone,
+        ampmComboBox,
         customerIdInput,
         titleInput,
         descriptionInput,
@@ -397,7 +429,7 @@ public class Appointments_CRUD {
         
         // don;t allow user to click anything else until they deal with window
         window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("Update Appointment");
+        window.setTitle("Add Appointment");
         window.setMinWidth(250); // 250px min width
         window.setScene(scene);
         window.showAndWait(); // special way to show, and wait for close to reurn to caller
