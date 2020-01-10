@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -314,10 +316,10 @@ public class Appointments_CRUD {
             cusUrl += importantValues.charAt((int) ((Math.random() * ((max - 0) + 1)) + 0));
         };
         
-        System.out.println(LocalDate.now());
-        System.out.println(LocalTime.now());
-        System.out.println(LocalDateTime.now());
-        System.out.println(ZonedDateTime.now());
+//        System.out.println(LocalDate.now());
+//        System.out.println(LocalTime.now());
+//        System.out.println(LocalDateTime.now());
+//        System.out.println(ZonedDateTime.now());
         
         TextField urlInput = new TextField( cusUrl );
         
@@ -332,7 +334,7 @@ public class Appointments_CRUD {
                 
         addButton.setOnAction(e -> {
             
-            // Extract start time and date and convert to military
+            // CONVERT TIME TO 24-HOUR TIME
             String startData = startDatePicker.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             String[] dateArr = startData.split("-");
             String userHour = "";
@@ -349,8 +351,8 @@ public class Appointments_CRUD {
                 userHour = hourComboBoxStart.getSelectionModel().getSelectedItem().toString();
             };
             
-            // Calculate end date
-            String endTimeUser;
+            // CALCULATE END TIME
+            LocalDateTime endTimeUser;
             
             if ( durationComboBox.getSelectionModel().getSelectedItem().toString().contains("Hour") ) {
             
@@ -360,25 +362,29 @@ public class Appointments_CRUD {
                     Integer.parseInt(dateArr[2]), 
                     Integer.parseInt(userHour), 
                     Integer.parseInt(minuteComboBoxStart.getSelectionModel().getSelectedItem().toString())
-                ).plusHours( Long.parseLong(durationComboBox.getSelectionModel().getSelectedItem().toString().split(" ")[0]) ).toString();
+                ).plusHours( Long.parseLong(durationComboBox.getSelectionModel().getSelectedItem().toString().split(" ")[0]) );
                 
             } else { 
-                
                 endTimeUser = LocalDateTime.of( 
                     Integer.parseInt(dateArr[0]) , 
                     Month.of(Integer.parseInt(dateArr[1])), 
                     Integer.parseInt(dateArr[2]), 
                     Integer.parseInt(userHour), 
                     Integer.parseInt(minuteComboBoxStart.getSelectionModel().getSelectedItem().toString())
-                ).plusMinutes( Long.parseLong(durationComboBox.getSelectionModel().getSelectedItem().toString().split(" ")[0]) ).toString();
+                ).plusMinutes( Long.parseLong(durationComboBox.getSelectionModel().getSelectedItem().toString().split(" ")[0]) );
                 
             };
+           
+            // CONVETING END TIME TO UTC
+            ZonedDateTime localUserTime = ZonedDateTime.of(endTimeUser, ZoneId.of(customerTimeZone.getSelectionModel().getSelectedItem().toString()) );
+            localUserTime = localUserTime.withZoneSameInstant(ZoneOffset.UTC);
+            String endTimeCalculated = localUserTime.toString().replace('T', ' ').replace('Z', ' ').trim();
             
-            endTimeUser = endTimeUser.replace('T', ' ');
-            
-            
-            // Parse start date
-            String startTimeUser = String.format("%s %s:%s:00", startData, userHour, minuteComboBoxStart.getSelectionModel().getSelectedItem().toString());
+            // CONVERTING START TIME TO UTC
+            LocalDateTime startTimeUser = LocalDateTime.parse( String.format("%sT%s:%s:00", startData, userHour, minuteComboBoxStart.getSelectionModel().getSelectedItem().toString()) );
+            ZonedDateTime localUserTimeStart = ZonedDateTime.of(startTimeUser, ZoneId.of(customerTimeZone.getSelectionModel().getSelectedItem().toString()) );
+            localUserTimeStart = localUserTimeStart.withZoneSameInstant(ZoneOffset.UTC);
+            String startTimeCalculated = localUserTimeStart.toString().replace('T', ' ').replace('Z', ' ').trim();
 
             apiDB.addAppointment(
                     customerIdInput.getText(),
@@ -388,8 +394,8 @@ public class Appointments_CRUD {
                     contactInput.getText(),
                     typeInput.getText(),
                     urlInput.getText(),
-                    startTimeUser,
-                    endTimeUser,
+                    startTimeCalculated,
+                    endTimeCalculated,
                     username
             );
 
