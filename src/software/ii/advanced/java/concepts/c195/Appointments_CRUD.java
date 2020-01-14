@@ -6,6 +6,7 @@
 package software.ii.advanced.java.concepts.c195;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -345,8 +346,9 @@ public class Appointments_CRUD {
                 userHour = Integer.toString(tempHour);
 
             } else {
-                userHour = hourComboBoxStart.getSelectionModel().getSelectedItem().toString();
+                userHour = "0" + hourComboBoxStart.getSelectionModel().getSelectedItem().toString();
             };
+           
             
             // CALCULATE END TIME
             LocalDateTime endTimeUser;
@@ -377,16 +379,18 @@ public class Appointments_CRUD {
             localUserTime = localUserTime.withZoneSameInstant(ZoneOffset.UTC);
             String endTimeCalculated = localUserTime.toString().replace('T', ' ').replace('Z', ' ').trim();
             
+
             // CONVERTING START TIME TO UTC
             LocalDateTime startTimeUser = LocalDateTime.parse( String.format("%sT%s:%s:00", startData, userHour, minuteComboBoxStart.getSelectionModel().getSelectedItem().toString()) );
             ZonedDateTime localUserTimeStart = ZonedDateTime.of(startTimeUser, ZoneId.of(customerTimeZone.getSelectionModel().getSelectedItem().toString()) );
             localUserTimeStart = localUserTimeStart.withZoneSameInstant(ZoneOffset.UTC);
             String startTimeCalculated = localUserTimeStart.toString().replace('T', ' ').replace('Z', ' ').trim();
 
+            System.out.println("pass");
             apiDB.addAppointment(
                     customerIdInput.getText(),
                     titleInput.getText(),
-                    descriptionInput.getText(),
+                    "[" + durationComboBox.getSelectionModel().getSelectedItem().toString() + "] " + descriptionInput.getText(),
                     locationInput.getText() + " [" + customerTimeZone.getSelectionModel().getSelectedItem().toString() + "]",
                     contactInput.getText(),
                     typeInput.getText(),
@@ -521,7 +525,7 @@ public class Appointments_CRUD {
         // field inputs
         TextField customerIdInput = new TextField( selectedAppointment.getCustomerId() );
         TextField titleInput = new TextField( selectedAppointment.getTitle() );
-        TextField descriptionInput = new TextField( selectedAppointment.getDescription() );
+        TextField descriptionInput = new TextField( selectedAppointment.getDescription().split( Pattern.quote("]"))[1].trim() );
         TextField locationInput = new TextField( selectedAppointment.getLocation().split( Pattern.quote("[") )[0].trim() );
         TextField contactInput = new TextField( selectedAppointment.getContact() );
         TextField typeInput = new TextField( selectedAppointment.getType() );
@@ -589,36 +593,54 @@ public class Appointments_CRUD {
         
         ComboBox customerTimeZone = new ComboBox(timeZones);
         
-        ComboBox hourComboBoxEnd = new ComboBox(hour);
-        ComboBox minuteComboBoxEnd = new ComboBox(minute);
-        
         ComboBox durationComboBox = new ComboBox(durationOptions);
-        
-        // Make default timzezone selection based on saved timezone in location
-        String savedCity = selectedAppointment.getLocation().split( Pattern.quote("[") )[1].replace("]", " ").trim();
-        
-        for (int i = 0; i < timeZones.size(); i++) {
-            
-            if (timeZones.get(i).toLowerCase().contains(savedCity.toLowerCase().replace(" ", "_"))) {
-                customerTimeZone.getSelectionModel().select(i);
-                break;
-            };
-      
-        };
-        
-        // make default time of day PM
-        ampmComboBox.getSelectionModel().select(1);
-        
+                        
         // Make time menu
         HBox timeMenuStart = new HBox(5);
-        HBox timeMenuEnd = new HBox(5);
         timeMenuStart.getChildren().addAll(hourComboBoxStart, minuteComboBoxStart);
-        timeMenuEnd.getChildren().addAll(hourComboBoxEnd, minuteComboBoxEnd);
         
         // Date picker
         //.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")
         DatePicker startDatePicker = new DatePicker( LocalDate.parse(selectedAppointment.getStart().split(" ")[0]) );
         DatePicker endDatePicker = new DatePicker();
+        
+                // Make default timzezone selection based on saved timezone in location
+        String savedTimeZone = selectedAppointment.getLocation().split( Pattern.quote("[") )[1].replace("]", " ").trim();
+        customerTimeZone.getSelectionModel().select(savedTimeZone);
+       
+        
+        // Select default appointment duration in description
+        String savedDuration = selectedAppointment.getDescription().split( Pattern.quote("]") )[0].replace("[", " ").trim();
+        durationComboBox.getSelectionModel().select(savedDuration);
+
+        // Select default start timE, CONVERTS UTC to customer local time
+        String savedStartTime = selectedAppointment.getDescription().split( Pattern.quote("]") )[0].replace("[", " ").trim();
+        
+        LocalDateTime savedStartTimeUser = LocalDateTime.parse( String.format("%sT%s:%s:00", selectedAppointment.getStart().split(" ")[0], selectedAppointment.getStart().split(" ")[1].split(":")[0], selectedAppointment.getStart().split(" ")[1].split(":")[1]) );
+        ZonedDateTime utcUserTimeStart = ZonedDateTime.of(savedStartTimeUser, ZoneId.of("UTC") );
+        utcUserTimeStart = utcUserTimeStart.withZoneSameInstant( ZoneId.of( savedTimeZone).getRules().getOffset(Instant.now()) );
+        String savedTimeCalculated = utcUserTimeStart.format(DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"));
+        
+        System.out.println(String.format("%sT%s:%s:00", selectedAppointment.getStart().split(" ")[0], selectedAppointment.getStart().split(" ")[1].split(":")[0], selectedAppointment.getStart().split(" ")[1].split(":")[1]));
+        System.out.println(savedTimeCalculated);
+        
+        int savedHour = Integer.parseInt(savedTimeCalculated.split(" ")[1].split(":")[0]);
+        String savedMinute = savedTimeCalculated.split(" ")[1].split(":")[1];
+        
+        // reformatting time to standard from military
+        if (savedHour > 11) {
+            
+            // set time of day to pm
+            ampmComboBox.getSelectionModel().select(1);
+            savedHour = savedHour - 12;
+            
+        } else {
+            ampmComboBox.getSelectionModel().select(0);
+        };
+        
+        hourComboBoxStart.getSelectionModel().select(Integer.toString( savedHour ));
+        minuteComboBoxStart.getSelectionModel().select(savedMinute);
+        
         
         // Add Button
         Button addButton = new Button("Update Appointment");
@@ -684,7 +706,7 @@ public class Appointments_CRUD {
             apiDB.addAppointment(
                     customerIdInput.getText(),
                     titleInput.getText(),
-                    descriptionInput.getText(),
+                    "[" + durationComboBox.getSelectionModel().getSelectedItem().toString() + "] " + descriptionInput.getText(),
                     locationInput.getText() + " [" + customerTimeZone.getSelectionModel().getSelectedItem().toString() + "]",
                     contactInput.getText(),
                     typeInput.getText(),
