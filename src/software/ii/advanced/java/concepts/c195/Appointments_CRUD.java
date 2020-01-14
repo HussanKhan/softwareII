@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -141,7 +142,7 @@ public class Appointments_CRUD {
         Button updateButton = createButton("UPDATE");
         updateButton.setOnAction(e -> {
             
-            updateAppointment(selectedAppointment);
+            updateAppointment();
            
         });
 
@@ -315,11 +316,7 @@ public class Appointments_CRUD {
         for (int i = 0; i < 20; i++) {
             cusUrl += importantValues.charAt((int) ((Math.random() * ((max - 0) + 1)) + 0));
         };
-        
-//        System.out.println(LocalDate.now());
-//        System.out.println(LocalTime.now());
-//        System.out.println(LocalDateTime.now());
-//        System.out.println(ZonedDateTime.now());
+
         
         TextField urlInput = new TextField( cusUrl );
         
@@ -390,7 +387,7 @@ public class Appointments_CRUD {
                     customerIdInput.getText(),
                     titleInput.getText(),
                     descriptionInput.getText(),
-                    locationInput.getText(),
+                    locationInput.getText() + " [" + customerTimeZone.getSelectionModel().getSelectedItem().toString() + "]",
                     contactInput.getText(),
                     typeInput.getText(),
                     urlInput.getText(),
@@ -495,11 +492,11 @@ public class Appointments_CRUD {
     };
     
     
-    public void updateAppointment(Appointment appointment) {
-        
+    public void updateAppointment() {
+                
         // set stage - window
         Stage window = new Stage();
-        
+
         // Layout
         GridPane grid = new GridPane(); // content all the way tot he edge of the screen
         grid.setPadding(new javafx.geometry.Insets(20, 20, 20, 20)); // border padding
@@ -514,45 +511,192 @@ public class Appointments_CRUD {
         Label contact = new Label("Contact");
         Label type = new Label("Type");
         Label url = new Label("URL");
-        Label start = new Label("Start");
-        Label end = new Label("End");
+        
+        Label zone = new Label("Timezone/Time of Day");
+        
+        Label start = new Label("Date");
+        Label startTime = new Label("Time");
+        Label duration = new Label("Duration");
         
         // field inputs
-        TextField customerIdInput = new TextField( appointment.getCustomerId() );
-        TextField titleInput = new TextField( appointment.getTitle() );
-        TextField descriptionInput = new TextField( appointment.getDescription() );
-        TextField locationInput = new TextField( appointment.getLocation() );
-        TextField contactInput = new TextField( appointment.getContact() );
-        TextField typeInput = new TextField( appointment.getType() );
-        Hyperlink urlInput = appointment.getUrl();
-        TextField startInput = new TextField( appointment.getStart() );
-        TextField endInput = new TextField( appointment.getEnd() );
+        TextField customerIdInput = new TextField( selectedAppointment.getCustomerId() );
+        TextField titleInput = new TextField( selectedAppointment.getTitle() );
+        TextField descriptionInput = new TextField( selectedAppointment.getDescription() );
+        TextField locationInput = new TextField( selectedAppointment.getLocation().split( Pattern.quote("[") )[0].trim() );
+        TextField contactInput = new TextField( selectedAppointment.getContact() );
+        TextField typeInput = new TextField( selectedAppointment.getType() );
+        TextField urlInput = new TextField( selectedAppointment.getUrl().getText() );
         
-        // Add Button
-        Button updateButton = new Button("Update Appointment");
-        updateButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
-        updateButton.setMinWidth(200);
-        
-        updateButton.setOnAction(e -> {
-            
-        apiDB.deleteAppointment(appointment.getId());
-            
-        apiDB.addAppointment(
-                customerIdInput.getText(),
-                titleInput.getText(),
-                descriptionInput.getText(),
-                locationInput.getText(),
-                contactInput.getText(),
-                typeInput.getText(),
-                urlInput.getText(),
-                "2019-12-30 12:00:00",
-                "2019-12-30 01:00:00",
-                username
+        // Time picker
+        ObservableList<String> hour = 
+        FXCollections.observableArrayList(
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12"
         );
         
-        appointmentTable.setItems(apiDB.getAllAppointments());
-                     
-        window.close();
+        ObservableList<String> minute = 
+        FXCollections.observableArrayList(
+            "00",
+            "10",
+            "20",
+            "30",
+            "40",
+            "50"
+        );
+        
+        ObservableList<String> ampm = 
+        FXCollections.observableArrayList(
+            "AM",
+            "PM"
+        );
+        
+        ObservableList<String> durationOptions = 
+        FXCollections.observableArrayList(
+            "10 Minutes",
+            "20 Minutes",
+            "30 Minutes",
+            "40 Minutes",
+            "50 Minutes",
+            "1 Hour",
+            "2 Hours",
+            "4 Hours",
+            "5 Hours"
+        );
+        
+        ObservableList<String> timeZones = FXCollections.observableArrayList();
+        
+        // Build timezones list
+        String[] data = TimeZone.getAvailableIDs();
+        
+        for (String temp : data) {
+            timeZones.add(temp);
+        };
+               
+        // combo boxes
+        ComboBox hourComboBoxStart = new ComboBox(hour);
+        ComboBox minuteComboBoxStart = new ComboBox(minute);
+        ComboBox ampmComboBox = new ComboBox(ampm);
+        
+        ComboBox customerTimeZone = new ComboBox(timeZones);
+        
+        ComboBox hourComboBoxEnd = new ComboBox(hour);
+        ComboBox minuteComboBoxEnd = new ComboBox(minute);
+        
+        ComboBox durationComboBox = new ComboBox(durationOptions);
+        
+        // Make default timzezone selection based on saved timezone in location
+        String savedCity = selectedAppointment.getLocation().split( Pattern.quote("[") )[1].replace("]", " ").trim();
+        
+        for (int i = 0; i < timeZones.size(); i++) {
+            
+            if (timeZones.get(i).toLowerCase().contains(savedCity.toLowerCase().replace(" ", "_"))) {
+                customerTimeZone.getSelectionModel().select(i);
+                break;
+            };
+      
+        };
+        
+        // make default time of day PM
+        ampmComboBox.getSelectionModel().select(1);
+        
+        // Make time menu
+        HBox timeMenuStart = new HBox(5);
+        HBox timeMenuEnd = new HBox(5);
+        timeMenuStart.getChildren().addAll(hourComboBoxStart, minuteComboBoxStart);
+        timeMenuEnd.getChildren().addAll(hourComboBoxEnd, minuteComboBoxEnd);
+        
+        // Date picker
+        //.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        DatePicker startDatePicker = new DatePicker( LocalDate.parse(selectedAppointment.getStart().split(" ")[0]) );
+        DatePicker endDatePicker = new DatePicker();
+        
+        // Add Button
+        Button addButton = new Button("Update Appointment");
+        addButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+        addButton.setMinWidth(200);
+                
+        addButton.setOnAction(e -> {
+            
+            // CONVERT TIME TO 24-HOUR TIME
+            String startData = startDatePicker.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String[] dateArr = startData.split("-");
+            String userHour = "";
+           
+            if ("PM".equals(ampmComboBox.getSelectionModel().getSelectedItem().toString())) {
+
+                int tempHour = Integer.parseInt(hourComboBoxStart.getSelectionModel().getSelectedItem().toString());
+
+                tempHour = tempHour + 12;
+
+                userHour = Integer.toString(tempHour);
+
+            } else {
+                userHour = hourComboBoxStart.getSelectionModel().getSelectedItem().toString();
+            };
+            
+            // CALCULATE END TIME
+            LocalDateTime endTimeUser;
+            
+            if ( durationComboBox.getSelectionModel().getSelectedItem().toString().contains("Hour") ) {
+            
+                endTimeUser = LocalDateTime.of( 
+                    Integer.parseInt(dateArr[0]) , 
+                    Month.of(Integer.parseInt(dateArr[1])), 
+                    Integer.parseInt(dateArr[2]), 
+                    Integer.parseInt(userHour), 
+                    Integer.parseInt(minuteComboBoxStart.getSelectionModel().getSelectedItem().toString())
+                ).plusHours( Long.parseLong(durationComboBox.getSelectionModel().getSelectedItem().toString().split(" ")[0]) );
+                
+            } else { 
+                endTimeUser = LocalDateTime.of( 
+                    Integer.parseInt(dateArr[0]) , 
+                    Month.of(Integer.parseInt(dateArr[1])), 
+                    Integer.parseInt(dateArr[2]), 
+                    Integer.parseInt(userHour), 
+                    Integer.parseInt(minuteComboBoxStart.getSelectionModel().getSelectedItem().toString())
+                ).plusMinutes( Long.parseLong(durationComboBox.getSelectionModel().getSelectedItem().toString().split(" ")[0]) );
+                
+            };
+           
+            // CONVETING END TIME TO UTC
+            ZonedDateTime localUserTime = ZonedDateTime.of(endTimeUser, ZoneId.of(customerTimeZone.getSelectionModel().getSelectedItem().toString()) );
+            localUserTime = localUserTime.withZoneSameInstant(ZoneOffset.UTC);
+            String endTimeCalculated = localUserTime.toString().replace('T', ' ').replace('Z', ' ').trim();
+            
+            // CONVERTING START TIME TO UTC
+            LocalDateTime startTimeUser = LocalDateTime.parse( String.format("%sT%s:%s:00", startData, userHour, minuteComboBoxStart.getSelectionModel().getSelectedItem().toString()) );
+            ZonedDateTime localUserTimeStart = ZonedDateTime.of(startTimeUser, ZoneId.of(customerTimeZone.getSelectionModel().getSelectedItem().toString()) );
+            localUserTimeStart = localUserTimeStart.withZoneSameInstant(ZoneOffset.UTC);
+            String startTimeCalculated = localUserTimeStart.toString().replace('T', ' ').replace('Z', ' ').trim();
+
+            apiDB.deleteAppointment(selectedAppointment.getId());
+            
+            apiDB.addAppointment(
+                    customerIdInput.getText(),
+                    titleInput.getText(),
+                    descriptionInput.getText(),
+                    locationInput.getText() + " [" + customerTimeZone.getSelectionModel().getSelectedItem().toString() + "]",
+                    contactInput.getText(),
+                    typeInput.getText(),
+                    urlInput.getText(),
+                    startTimeCalculated,
+                    endTimeCalculated,
+                    username
+            );
+
+            appointmentTable.setItems(apiDB.getAllAppointments());
+
+            window.close();
         
         });
         
@@ -578,36 +722,47 @@ public class Appointments_CRUD {
         GridPane.setConstraints(url, 0, 6);
         GridPane.setConstraints(urlInput, 1, 6);
         
-        GridPane.setConstraints(start, 0, 7);   
-        GridPane.setConstraints(startInput, 1, 7);       
+        GridPane.setConstraints(zone, 0, 7);
+        GridPane.setConstraints(customerTimeZone, 1, 7);
+        GridPane.setConstraints(ampmComboBox, 2, 7);
         
-        GridPane.setConstraints(end, 0, 8);   
-        GridPane.setConstraints(endInput, 1, 8);       
+        GridPane.setConstraints(start, 0, 8);   
+        GridPane.setConstraints(startDatePicker, 1, 8);
         
-        GridPane.setConstraints(updateButton, 1, 9);
+        GridPane.setConstraints(startTime, 0, 9); 
+        GridPane.setConstraints(timeMenuStart, 1, 9); 
+        
+        GridPane.setConstraints(duration, 0, 10);   
+        GridPane.setConstraints(durationComboBox, 1, 10);
+        
+        GridPane.setConstraints(addButton, 1, 11);
         
         // Add values to grid
         grid.getChildren().addAll(
-        customerId,
-        title,
-        description,
-        location,
-        contact,
-        type,
-        url,
-        start,
-        end,
-        customerIdInput,
-        titleInput,
-        descriptionInput,
-        locationInput,
-        contactInput,
-        typeInput,
-        urlInput,
-        startInput,
-        endInput,
-        updateButton
-                
+            customerId,
+            title,
+            description,
+            location,
+            contact,
+            type,
+            url,
+            start,
+            startTime,
+            timeMenuStart,
+            zone,
+            duration,
+            durationComboBox,
+            customerTimeZone,
+            ampmComboBox,
+            customerIdInput,
+            titleInput,
+            descriptionInput,
+            locationInput,
+            contactInput,
+            typeInput,
+            urlInput,
+            startDatePicker,
+            addButton 
         );
         
         grid.setAlignment( Pos.CENTER );
@@ -621,9 +776,12 @@ public class Appointments_CRUD {
         // scene - add layout to scene
         Scene scene = new Scene(layout);
         
+        // store empty
+        selectedCustomer = null;
+        
         // don;t allow user to click anything else until they deal with window
         window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("Add Appointment");
+        window.setTitle("Update Appointment");
         window.setMinWidth(250); // 250px min width
         window.setScene(scene);
         window.showAndWait(); // special way to show, and wait for close to reurn to caller
