@@ -5,6 +5,9 @@
  */
 package software.ii.advanced.java.concepts.c195;
 
+import java.util.Calendar;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -30,6 +33,7 @@ public class Calender_CRUD {
         };
         this.username = username;
         lastStage = mainStage;
+
     };
     
     
@@ -48,20 +52,54 @@ public class Calender_CRUD {
         
         Label sceneTitle = new Label("Calender Options");
         
-        GridPane.setConstraints( sceneTitle, 0, 0);  
-        GridPane.setConstraints( addButton, 0, 1);  
-        GridPane.setConstraints( updateButton, 0, 2);  
-        GridPane.setConstraints( deleteButton, 0, 3);  
-        GridPane.setConstraints( backButton, 0, 4);  
+        // CREATE CALENDER FOR CURRENT MONTH
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 1); 
+        int myMonth=cal.get(Calendar.MONTH);
         
-        // Add values to grid
-        grid.getChildren().addAll(
-                addButton,
-                updateButton,
-                deleteButton,
-                backButton,
-                sceneTitle
-        );
+        ObservableList<String> daysInMonth = FXCollections.observableArrayList();
+        
+        int numOfWeeks = 1;
+        
+        while (myMonth==cal.get(Calendar.MONTH)) {
+            System.out.println(cal.getTime());
+            System.out.println();
+            
+            daysInMonth.add( String.format("%s %s", cal.getTime().getDay(), cal.getTime().toString().split(" ")[2] ));
+            
+            if ( cal.getTime().getDay() == 0) {
+                numOfWeeks += 1;
+            };
+            
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+        };
+        
+        int weekNum = 0;
+        for (int j = 0; j < daysInMonth.size(); j++) {
+                
+            if (Integer.parseInt(daysInMonth.get(j).split(" ")[0]) == 0) {
+                weekNum += 1;
+            };
+
+            Label calenderValue = new Label( daysInMonth.get(j).split(" ")[1] );
+            GridPane.setConstraints( calenderValue, Integer.parseInt(daysInMonth.get(j).split(" ")[0]), weekNum);  
+            grid.getChildren().add(calenderValue);
+        };
+        
+//        GridPane.setConstraints( sceneTitle, 0, 0);  
+//        GridPane.setConstraints( addButton, 0, 1);  
+//        GridPane.setConstraints( updateButton, 0, 2);  
+//        GridPane.setConstraints( deleteButton, 0, 3);  
+//        GridPane.setConstraints( backButton, 0, 4);  
+//        
+//        // Add values to grid
+//        grid.getChildren().addAll(
+//                addButton,
+//                updateButton,
+//                deleteButton,
+//                backButton,
+//                sceneTitle
+//        );
         
         grid.setAlignment( Pos.CENTER );
                 

@@ -65,10 +65,10 @@ public class Appointments_CRUD {
         TableColumn<Appointment, String> id = new TableColumn<>("ID");
         id.setCellValueFactory(new PropertyValueFactory<>("id"));
         
-        TableColumn<Appointment, String> start = new TableColumn<>("Start Customer Timezone");
+        TableColumn<Appointment, String> start = new TableColumn<>("Start (UTC)");
         start.setCellValueFactory(new PropertyValueFactory<>("start"));
         
-        TableColumn<Appointment, String> end = new TableColumn<>("End Customer Timezone");
+        TableColumn<Appointment, String> end = new TableColumn<>("End (UTC)");
         end.setCellValueFactory(new PropertyValueFactory<>("end"));       
         
         TableColumn<Appointment, String> type = new TableColumn<>("Type");
@@ -207,7 +207,7 @@ public class Appointments_CRUD {
         Label zone = new Label("Timezone/Time of Day");
         
         Label start = new Label("Date");
-        Label startTime = new Label("Time");
+        Label startTime = new Label("Start Time (Customer Local Time)");
         Label duration = new Label("Duration");
         
         // field inputs
@@ -519,7 +519,7 @@ public class Appointments_CRUD {
         Label zone = new Label("Timezone/Time of Day");
         
         Label start = new Label("Date");
-        Label startTime = new Label("Time");
+        Label startTime = new Label("Start Time (Customer Local Time)");
         Label duration = new Label("Duration");
         
         // field inputs
