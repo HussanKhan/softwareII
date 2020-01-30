@@ -138,5 +138,46 @@ public class SQLDriver_Appointment {
         
     };
     
+    
+    // get all Appointments
+    public ObservableList<Appointment> AppointmentByMonth(String year, String month){
+    
+        ObservableList<Appointment> matches = FXCollections.observableArrayList();
+        
+        try {
+            ResultSet result = statement.executeQuery("SELECT * FROM appointment WHERE start LIKE '2020-01-%';");
+            
+            while (result.next()) {
+                
+                Appointment tempAppoint = new Appointment();
+                
+                tempAppoint.setId(result.getString("appointmentId"));
+                tempAppoint.setCustomerId(result.getString("customerId"));
+                tempAppoint.setUserId(result.getString("userId"));
+                tempAppoint.setTitle(result.getString("title"));
+                tempAppoint.setDescription(result.getString("description"));
+                tempAppoint.setLocation(result.getString("location"));
+                tempAppoint.setContact(result.getString("contact"));
+                tempAppoint.setType(result.getString("type"));
+                tempAppoint.setUrl(result.getString("url"));
+                tempAppoint.setStart(result.getString("start"));
+                tempAppoint.setEnd(result.getString("end"));
+                
+                matches.add(tempAppoint);
+                
+                System.out.println(result.getString("description"));
+                System.out.println("got it");
+                
+            };
+                        
+        } catch (Exception err) {
+            System.out.println(err);
+            System.out.println("from api");
+        };
+            
+       return matches;
+        
+    };
+    
 
 }

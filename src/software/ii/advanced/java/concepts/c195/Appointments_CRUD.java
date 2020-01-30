@@ -51,11 +51,11 @@ public class Appointments_CRUD {
     private SQLDriver_Appointment apiDB = new SQLDriver_Appointment();
     private String username;
     
-    TableView<Appointment> appointmentTable;
+    private TableView<Appointment> appointmentTable;
     
-    Appointment selectedAppointment;
+    private Appointment selectedAppointment;
     
-    Customer selectedCustomer;
+    private Customer selectedCustomer;
     
     public Appointments_CRUD(Scene prevScene, Stage mainStage, String username) {
         
