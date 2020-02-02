@@ -25,7 +25,7 @@ public class CalenderItem {
         this.date = date;
         
         for (Appointment tempAppoint : currentMonthAppointments) {
-            System.out.println(date +"item");
+            
             if (tempAppoint.getStart().contains(date)) {
                 todaysAppointments.add(tempAppoint);
                 numAppointments++;
@@ -51,8 +51,8 @@ public class CalenderItem {
         container.getChildren().addAll(dateLabel, appointments);
         
         container.setPadding(new javafx.geometry.Insets(0, 10, 0, 10));
-        container.setMinHeight(75);
-        container.setMaxHeight(75);
+        container.setMinHeight(50);
+        container.setMaxHeight(50);
         return container;
     
     };

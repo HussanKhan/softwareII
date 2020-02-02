@@ -85,6 +85,8 @@ public class Appointments_CRUD {
         appointmentTable.setItems(apiDB.getAllAppointments());
         appointmentTable.getColumns().addAll(id, start, end, type, title, link);
         appointmentTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        
+        // Using lamda to detect selection on tableview
         appointmentTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                  selectedAppointment = appointmentTable.getSelectionModel().getSelectedItems().get(0);
@@ -329,24 +331,24 @@ public class Appointments_CRUD {
         Button addButton = new Button("Add Appointment");
         addButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
         addButton.setMinWidth(200);
-                
+        
+        // using lamda on button click to execute operations
         addButton.setOnAction(e -> {
             
             // CONVERT TIME TO 24-HOUR TIME
             String startData = startDatePicker.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             String[] dateArr = startData.split("-");
             String userHour = "";
+            int tempHour = Integer.parseInt(hourComboBoxStart.getSelectionModel().getSelectedItem().toString());
            
+            // CONVERTS TIME TO MILITARY TIME, ONLY EXECUTES ON LINE, SO GREATE FOR LAMDA
             if ("PM".equals(ampmComboBox.getSelectionModel().getSelectedItem().toString())) {
-
-                int tempHour = Integer.parseInt(hourComboBoxStart.getSelectionModel().getSelectedItem().toString());
-
                 tempHour = tempHour + 12;
-
-                userHour = Integer.toString(tempHour);
-
-            } else {
+            } 
+            if (tempHour < 10) {
                 userHour = "0" + hourComboBoxStart.getSelectionModel().getSelectedItem().toString();
+            } else {
+                userHour = Integer.toString(tempHour);
             };
            
             
@@ -385,9 +387,8 @@ public class Appointments_CRUD {
             ZonedDateTime localUserTimeStart = ZonedDateTime.of(startTimeUser, ZoneId.of(customerTimeZone.getSelectionModel().getSelectedItem().toString()) );
             localUserTimeStart = localUserTimeStart.withZoneSameInstant(ZoneOffset.UTC);
             String startTimeCalculated = localUserTimeStart.toString().replace('T', ' ').replace('Z', ' ').trim();
-
-            System.out.println("pass");
-            apiDB.addAppointment(
+                    
+            int status = apiDB.addAppointment(
                     customerIdInput.getText(),
                     titleInput.getText(),
                     "[" + durationComboBox.getSelectionModel().getSelectedItem().toString() + "] " + descriptionInput.getText(),
@@ -397,13 +398,15 @@ public class Appointments_CRUD {
                     urlInput.getText(),
                     startTimeCalculated,
                     endTimeCalculated,
-                    username
+                    username,
+                    localUserTimeStart
             );
+            
+            if (status == 1) {
+                appointmentTable.setItems(apiDB.getAllAppointments());
+                window.close();
+            };
 
-            appointmentTable.setItems(apiDB.getAllAppointments());
-
-            window.close();
-        
         });
         
         // Mappings
@@ -649,6 +652,7 @@ public class Appointments_CRUD {
                 
         addButton.setOnAction(e -> {
             
+           
             // CONVERT TIME TO 24-HOUR TIME
             String startData = startDatePicker.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             String[] dateArr = startData.split("-");
@@ -700,10 +704,8 @@ public class Appointments_CRUD {
             ZonedDateTime localUserTimeStart = ZonedDateTime.of(startTimeUser, ZoneId.of(customerTimeZone.getSelectionModel().getSelectedItem().toString()) );
             localUserTimeStart = localUserTimeStart.withZoneSameInstant(ZoneOffset.UTC);
             String startTimeCalculated = localUserTimeStart.toString().replace('T', ' ').replace('Z', ' ').trim();
-
-            apiDB.deleteAppointment(selectedAppointment.getId());
             
-            apiDB.addAppointment(
+            int status = apiDB.addAppointment(
                     customerIdInput.getText(),
                     titleInput.getText(),
                     "[" + durationComboBox.getSelectionModel().getSelectedItem().toString() + "] " + descriptionInput.getText(),
@@ -713,13 +715,16 @@ public class Appointments_CRUD {
                     urlInput.getText(),
                     startTimeCalculated,
                     endTimeCalculated,
-                    username
+                    username,
+                    localUserTimeStart
             );
-
-            appointmentTable.setItems(apiDB.getAllAppointments());
-
-            window.close();
-        
+            
+            if (status == 1) {
+                apiDB.deleteAppointment(selectedAppointment.getId());
+                appointmentTable.setItems(apiDB.getAllAppointments());
+                window.close();
+            };
+       
         });
         
         // Mappings

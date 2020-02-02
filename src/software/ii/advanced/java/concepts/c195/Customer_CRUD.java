@@ -212,7 +212,7 @@ public class Customer_CRUD {
             
             System.out.println(activeState);
                    
-            apiDB.setCustomer(
+            int status = apiDB.setCustomer(
                     nameInput.getText(),
                     activeState,
                     addressInput.getText(),
@@ -224,10 +224,11 @@ public class Customer_CRUD {
                     username
             );
             
-            customerTable.setItems(apiDB.getAllCustomers());
+            if (status == 1) {
+                customerTable.setItems(apiDB.getAllCustomers());
+                window.close();
+            };
             
-            window.close();
-     
         });
         
         // Mappings
@@ -339,7 +340,7 @@ public class Customer_CRUD {
                 activeState = "0";
             };
                    
-            apiDB.updateCustomer(
+            int status = apiDB.updateCustomer(
                     customer.getCustomerId(),
                     nameInput.getText(),
                     activeState,
@@ -352,10 +353,11 @@ public class Customer_CRUD {
                     username
             );
             
-            customerTable.setItems(apiDB.getAllCustomers());
-            
-            window.close();
-     
+            if (status == 1) {
+                customerTable.setItems(apiDB.getAllCustomers());    
+                window.close();
+            };
+
         });
         
         // Mappings

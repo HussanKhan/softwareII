@@ -99,7 +99,6 @@ public class Calender_CRUD {
         System.out.println("IMonth: " + mainCalender.get(Calendar.MONTH));
         
         while (month==mainCalender.get(Calendar.MONTH)) {
-            System.out.println("ran caledner " + month);
             daysInMonth.add( String.format("%s %s", mainCalender.getTime().getDay(), mainCalender.getTime().toString().split(" ")[2] ));           
             mainCalender.add(Calendar.DAY_OF_MONTH, 1);
         };
@@ -139,7 +138,7 @@ public class Calender_CRUD {
 
                 // Create calender object
                 String date = String.format("%s-%s-%s", year, formatMonth, daysInMonth.get(j).split(" ")[1]);
-                System.out.println(date + "inner ");
+           
                 VBox item = new CalenderItem(date, currentMonthAppointments).generateCard();
                 GridPane.setConstraints( item, Integer.parseInt(daysInMonth.get(j).split(" ")[0]), weekNum);  
                 calenderGrid.getChildren().add(item);
@@ -169,10 +168,10 @@ public class Calender_CRUD {
                 
                 // Create calender object
                 String date = String.format("%s-%s-%s", year, formatMonth, daysInMonth.get(j).split(" ")[1]);
-                System.out.println(date + "inner ");
+                
                 VBox item = new CalenderItem(date, currentMonthAppointments).generateCard();
                 VBox emptyCal = new VBox(5);
-                emptyCal.setMinHeight(75);
+                emptyCal.setMinHeight(50);
                 emptyCal.setPadding(new javafx.geometry.Insets(0, 10, 0, 10));
                 
                 if (weekNum == weekIncr) {
@@ -215,6 +214,9 @@ public class Calender_CRUD {
                 mainCalender.add(Calendar.MONTH, -1);
                 weekControl = 100;
                 break;
+            case "initMonth":
+                weekControl = 100;
+                break;
             case "nextWeek":
                 currentWeekSelected = currentWeekSelected + 1;
                 weekControl = currentWeekSelected + 1;
@@ -238,6 +240,7 @@ public class Calender_CRUD {
         month = mainCalender.get(Calendar.MONTH);
         monthName = months[month];
         currentMonthAppointments = apiDB.AppointmentByMonth(Integer.toString(year), Integer.toString(month+1));
+        System.out.println(Integer.toString(month+1));
         renderCalender(weekControl);
         
         return monthName;
@@ -320,11 +323,13 @@ public class Calender_CRUD {
                 monthTitle.setText(monthName + " Week: " + weekNum);
                 System.out.println("Week Mode");
             };
+            
         });
         
         monthButton.setOnAction(e -> {
             if (monthButton.isSelected()) {
                 calMode = "Month";
+                updateCalender("initMonth");
                 monthTitle.setText(monthName);
                 System.out.println("Month Mode");
             };

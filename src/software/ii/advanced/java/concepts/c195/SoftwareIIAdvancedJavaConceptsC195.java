@@ -5,9 +5,16 @@
  */
 package software.ii.advanced.java.concepts.c195;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import javafx.scene.paint.Color;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -33,6 +40,8 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
     private String langCode = "es";
     private String countryCode = "US";
     private String userName = "";
+    
+    private DataLogger dataLogger = new DataLogger();
     
     @Override
     public void start(Stage primaryStage) {
@@ -93,13 +102,15 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         // Login button
         Button loginButton = new Button( getLangKey(langCode, countryCode, "promptCat") );
         loginButton.setOnAction(e -> {
-                  
-            if (apiDB.login(userInput.getText(), passwordInput.getText()) == 0) {
+                 
+            try {
+                apiDB.login(userInput.getText(), passwordInput.getText());
+                userName = userInput.getText();
+                primaryStage.setScene( new NAV_SCENE(null, primaryStage, userName).generateNavScene() );
+            } catch(IllegalArgumentException excpt) {
                 errorCat.setText( getLangKey(langCode, countryCode, "errorCat") + ": ");
                 errorMessage.setText( getLangKey(langCode, countryCode, "errorMsg") );
-            } else {
-                 userName = userInput.getText();
-                 primaryStage.setScene( new NAV_SCENE(null, primaryStage, userName).generateNavScene() );
+                dataLogger.logFailedLogin(userName);
             };
             
         });
@@ -139,10 +150,40 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         
         Scene scene = new Scene(root, 1280, 720);
         
+        appointmentCheck();
+        
         primaryStage.setTitle( getLangKey(langCode, countryCode, "promptCat") );
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+    
+    // check if appointment within 15 min of user sign in
+    public int appointmentCheck() {
+        
+        SQLDriver_Appointment apiDB = new SQLDriver_Appointment();
+        
+        // get current time
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        timeStamp = timeStamp.replace(" ", "T");
+        
+        // convert current time to utc        
+        LocalDateTime timeUser = LocalDateTime.parse(timeStamp);
+        ZonedDateTime localUserTime = ZonedDateTime.of(timeUser, ZoneId.of(TimeZone.getDefault().getID()) );
+        localUserTime = localUserTime.withZoneSameInstant(ZoneOffset.UTC);
+        String currentTime = localUserTime.toString().replace('T', ' ').replace('Z', ' ').trim();
+        String endTime = localUserTime.plusMinutes(15).toString().replace('T', ' ').replace('Z', ' ').trim();
+        
+        // throws error if appointment within 15 minutes
+        try {
+            apiDB.appointmentOverlapCheck(currentTime, endTime);
+        } catch (Exception err) {
+            
+            // opens popupr
+            new ErrorPopup().displayError("Appointment within 15 Minutes!");
+        };
+                
+        return 0;
+    };
     
     public String getLangKey(String lang, String countryCode, String key) {
         Locale.setDefault(new Locale(lang, countryCode));

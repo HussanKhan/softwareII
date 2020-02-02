@@ -171,7 +171,14 @@ public class SQLDriver_Customer {
             String country,
 	    String username) {
         
-        System.out.println(customerName);
+                // CHECK USER FOR INVALID POSTAL CODE
+         try {
+              // see if all int
+             Integer.parseInt(postal);
+        } catch(Exception ex) {
+            new ErrorPopup().displayError("Invalid Postal Code");
+            return 0;
+        };
         
         // check to see if in DB
         String command;
@@ -212,81 +219,9 @@ public class SQLDriver_Customer {
             System.out.println("Customer");
         };
      
-        return 0;
+        return 1;
     };
-    
-        // Add city if not in DB
-    // DATETIME == YYYY-MM-DD HH:MM:SS
-    public int setAppointment(
-            String customerName, 
-            String phone,
-            String username,
-            String title,
-            String desc,
-            String location,
-            String contact,
-            String type,
-            String url,
-            String start,
-            String end
-            ) {
-        
-        return 0;
-    };
-      
-    public int customerData(
-            String customerName,
-            String active,
-            String address, 
-            String address2,
-            String postal, 
-            String phone,
-            String city,
-            String country,
-            String username
-        ) {
-        
-        // Add Customer
-        setCustomer(
-                customerName,
-                active,
-                address, 
-                address2,
-                postal, 
-                phone,
-                city,
-                country,
-                username
-        );
-        
-        return 0;
- 
-    };
-    
-    // returns all data from result set
-    private void printAllData(ResultSet result) {
-        
-        try {
-        
-            int colNumbers = result.getMetaData().getColumnCount() + 1;
-            
-            System.out.println("---------------------------------------------------------------------------------------");
-            
-            while (result.next()) {
-                
-                for (int i = 1; i < colNumbers; i++) {
-                    
-                    System.out.println(result.getMetaData().getColumnName(i) + ": " + result.getString(i));
-                
-                };
-                
-                System.out.println("---------------------------------------------------------------------------------------");
-             };
-             
-        } catch (Exception err) {};
-        
-    };
-    
+     
     public Customer getCustomer(String id) {
         
         Customer tempCustomer = new Customer();
@@ -401,7 +336,7 @@ public class SQLDriver_Customer {
         };
     };
     
-    public void updateCustomer(
+    public int updateCustomer(
             String id,
             String customerName,
             String active,
@@ -418,7 +353,7 @@ public class SQLDriver_Customer {
             deleteCustomer( Integer.parseInt(id) );
             // add new entry
                     // Add Customer
-            setCustomer(
+            int res = setCustomer(
                 customerName,
                 active,
                 address, 
@@ -429,9 +364,14 @@ public class SQLDriver_Customer {
                 country,
                 username
             );
+            
+            return res;
+            
         } catch (Exception err) {
             System.out.println(err);
         };
+        
+        return 1;
     };
     
     public ResultSet getAddress(String addressId){
@@ -489,6 +429,10 @@ public class SQLDriver_Customer {
              
         } catch (Exception exc) {
             System.out.println(exc);
+        };
+        
+        if (queryState == 0) {
+            throw new IllegalArgumentException("Invalid Login-In Information");
         };
         
         return queryState;
