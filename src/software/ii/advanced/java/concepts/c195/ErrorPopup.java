@@ -24,7 +24,7 @@ public class ErrorPopup {
 
     public ErrorPopup() {};
     
-    public void displayError(String errMsg) {
+    public void displayError(String errMsg, String title) {
         
         
         // set stage - window
@@ -35,13 +35,14 @@ public class ErrorPopup {
             window.close();
         });
         closeButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+        closeButton.setMinWidth(40);
         
         VBox container = new VBox(10);
         Label msg = new Label(errMsg);
         msg.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
         
         container.setAlignment(Pos.CENTER);
-        
+        container.setPadding(new javafx.geometry.Insets(15, 15, 15, 15));
         container.getChildren().addAll(msg, closeButton);
         
         // scene - add layout to scene
@@ -49,7 +50,7 @@ public class ErrorPopup {
 
         // don;t allow user to click anything else until they deal with window
         window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("ERROR");
+        window.setTitle(title);
         window.setMinWidth(250); // 250px min width
         window.setScene(scene);
         window.showAndWait(); // special way to show, and wait for close to reurn to caller

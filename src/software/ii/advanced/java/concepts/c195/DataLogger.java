@@ -110,7 +110,7 @@ public class DataLogger {
             
             BufferedWriter writer = new BufferedWriter( 
                    new FileWriter("InvalidLogins.txt", true)); 
-            writer.write(username + " " +  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\n"); 
+            writer.write("Username: " + username + "\t" + "Timestamp: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\n"); 
             writer.close();
             
         } catch (Exception err) {
@@ -118,5 +118,22 @@ public class DataLogger {
         };
         
     };
+    
+    //  track user activity by recording timestamps
+    public void trackuser(String username) {
+        
+        try {
+            
+            BufferedWriter writer = new BufferedWriter( 
+                   new FileWriter("UserTimeStamps.txt", true)); 
+            writer.write("Username: " + username + "\t" + "Timestamp: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\n"); 
+            writer.close();
+            
+        } catch (Exception err) {
+            System.out.println(err);
+        };
+        
+    };
+    
     
 }

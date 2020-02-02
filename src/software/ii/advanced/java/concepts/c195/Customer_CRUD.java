@@ -71,10 +71,12 @@ public class Customer_CRUD {
         customerTable.setItems(apiDB.getAllCustomers());
         customerTable.getColumns().addAll(id, name, address, address2, city, postal, country, phone);
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        
+        // LAMDA TO KEEP TRACK OF USER SELECTION ON TABLE
         customerTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                  selectedCustomer = customerTable.getSelectionModel().getSelectedItems().get(0);
-                 System.out.println(customerTable.getSelectionModel().getSelectedItems().get(0).getCustomerName());
+                 
             }
         });
         
@@ -141,7 +143,6 @@ public class Customer_CRUD {
         Button deleteButton = createButton("DELETE");
         deleteButton.setOnAction(e -> {
             
-           System.out.println("delete DATA CLICKED");
            
            apiDB.deleteCustomer( Integer.parseInt(selectedCustomer.getCustomerId()) );
            customerTable.setItems(apiDB.getAllCustomers());
@@ -210,7 +211,6 @@ public class Customer_CRUD {
                 activeState = "0";
             };
             
-            System.out.println(activeState);
                    
             int status = apiDB.setCustomer(
                     nameInput.getText(),
@@ -320,9 +320,7 @@ public class Customer_CRUD {
         updateButton.setMinWidth(200);
         
         ToggleButton toggleActive = new ToggleButton("Active");
-        
-        System.out.println(customer.getActive());
-        
+
         if ("1".equals(customer.getActive())) {
             toggleActive.setSelected(true);
         } else {

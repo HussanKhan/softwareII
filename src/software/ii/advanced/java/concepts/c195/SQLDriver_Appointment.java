@@ -73,7 +73,6 @@ public class SQLDriver_Appointment{
         utcUserTimeStart = utcUserTimeStart.withZoneSameInstant( ZoneId.of( TimeZone.getDefault().getID() ).getRules().getOffset(Instant.now()) );
         String savedTimeCalculated = utcUserTimeStart.format(DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"));
         
-        System.out.println("YOUR TIME: " + savedTimeCalculated);
             
         int savedHour = Integer.parseInt(savedTimeCalculated.split(" ")[1].split(":")[0]);
         String userDeviceTime;
@@ -107,30 +106,38 @@ public class SQLDriver_Appointment{
     };
     
     // checks if appointment overlap
-    public int appointmentOverlapCheck(String start, String end) throws OverlapAppointmentTime{
+    public int appointmentOverlapCheck(String start, String end, String appId, String userId) throws OverlapAppointmentTime{
         
         int status = 1;
         
         try {
-            ResultSet result = statement.executeQuery(String.format("SELECT * FROM appointment WHERE start <= '%s' and end >= '%s'", start, end));
+            ResultSet result;
+            
+            result = statement.executeQuery(String.format("SELECT * FROM appointment WHERE '%s' >= start and '%s' <= end ", start, start));
             
             while (result.next()) {
                 
-                status = 0;
+                if (appId != null) {
+                    if (!(appId.equals(result.getString("appointmentId")))) {
+                        status = 0;
+                    };
+                } else {
+                    status = 0;
+                };
+                
                 
             };
                         
         } catch (Exception err) {
             System.out.println(err);
-            System.out.println("from api");
         };
         
         if (status == 0) {
             throw new OverlapAppointmentTime("Appoitnment Overlapping");
         };
         
-        
-        return 1;
+
+        return status;
     };
     
     // Add appointment
@@ -145,17 +152,23 @@ public class SQLDriver_Appointment{
             String start,
             String end,
             String username,
-            ZonedDateTime localUserTimeStart
+            ZonedDateTime localUserTimeStart,
+            String appId
     ){
         try {
             // CUSTOM EXCEPTION
             checkHour(localUserTimeStart);
             
-            // check overlapping
-            appointmentOverlapCheck(start, end);
-            
         } catch (Exception err) {
-            new ErrorPopup().displayError("Appointment not within business hours");
+            new ErrorPopup().displayError("Appointment not within business hours", "Error");
+            return 0;
+        };
+            
+        try {
+            // check overlapping
+            appointmentOverlapCheck(start, end, appId, null);
+        } catch (Exception err) {
+            new ErrorPopup().displayError("Appointment Overlapping", "Error");
             return 0;
         };
                 
@@ -204,7 +217,7 @@ public class SQLDriver_Appointment{
                         
         } catch (Exception err) {
             System.out.println(err);
-            System.out.println("from api");
+      
         };
         
         
@@ -226,7 +239,7 @@ public class SQLDriver_Appointment{
                         
         } catch (Exception err) {
             System.out.println(err);
-            System.out.println("from api");
+        
         };
         
         String report = "";
@@ -247,7 +260,7 @@ public class SQLDriver_Appointment{
                         
         } catch (Exception err) {
             System.out.println(err);
-            System.out.println("from api");
+
         };
         
         return report;
@@ -284,7 +297,7 @@ public class SQLDriver_Appointment{
                         
         } catch (Exception err) {
             System.out.println(err);
-            System.out.println("from api");
+
         };
             
        return matches;
@@ -322,14 +335,11 @@ public class SQLDriver_Appointment{
                 
                 matches.add(tempAppoint);
                 
-                System.out.println(result.getString("description"));
-                System.out.println("got it");
                 
             };
                         
         } catch (Exception err) {
             System.out.println(err);
-            System.out.println("from api");
         };
             
        return matches;

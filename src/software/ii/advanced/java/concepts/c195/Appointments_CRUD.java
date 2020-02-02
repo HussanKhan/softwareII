@@ -90,7 +90,7 @@ public class Appointments_CRUD {
         appointmentTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                  selectedAppointment = appointmentTable.getSelectionModel().getSelectedItems().get(0);
-                 System.out.println(appointmentTable.getSelectionModel().getSelectedItems().get(0).getTitle());
+                 
             }
         });
         
@@ -399,7 +399,8 @@ public class Appointments_CRUD {
                     startTimeCalculated,
                     endTimeCalculated,
                     username,
-                    localUserTimeStart
+                    localUserTimeStart,
+                    null
             );
             
             if (status == 1) {
@@ -624,9 +625,6 @@ public class Appointments_CRUD {
         utcUserTimeStart = utcUserTimeStart.withZoneSameInstant( ZoneId.of( savedTimeZone).getRules().getOffset(Instant.now()) );
         String savedTimeCalculated = utcUserTimeStart.format(DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"));
         
-        System.out.println(String.format("%sT%s:%s:00", selectedAppointment.getStart().split(" ")[0], selectedAppointment.getStart().split(" ")[1].split(":")[0], selectedAppointment.getStart().split(" ")[1].split(":")[1]));
-        System.out.println(savedTimeCalculated);
-        
         int savedHour = Integer.parseInt(savedTimeCalculated.split(" ")[1].split(":")[0]);
         String savedMinute = savedTimeCalculated.split(" ")[1].split(":")[1];
         
@@ -668,6 +666,11 @@ public class Appointments_CRUD {
 
             } else {
                 userHour = hourComboBoxStart.getSelectionModel().getSelectedItem().toString();
+            };
+            
+            // append 0
+            if (Integer.parseInt(userHour) < 10) {
+                userHour = "0" + userHour;
             };
             
             // CALCULATE END TIME
@@ -716,7 +719,8 @@ public class Appointments_CRUD {
                     startTimeCalculated,
                     endTimeCalculated,
                     username,
-                    localUserTimeStart
+                    localUserTimeStart,
+                    selectedAppointment.getId()
             );
             
             if (status == 1) {
@@ -854,7 +858,7 @@ public class Appointments_CRUD {
         customerTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                  selectedCustomer = customerTable.getSelectionModel().getSelectedItems().get(0);
-                 System.out.println(customerTable.getSelectionModel().getSelectedItems().get(0).getCustomerName());
+                 
             }
         });
         // set stage - window

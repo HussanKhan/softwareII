@@ -27,16 +27,6 @@ public class Customer {
         
     };
     
-    public void printAll(){
-        System.out.println("ID: " + customerId);
-        System.out.println("NAME: " + customerName);
-        System.out.println("ADDRESS: " + address);
-        System.out.println("ADDRESS2: " + address2);
-        System.out.println("CITY: " + city);
-        System.out.println("POSTAL: " + postal);
-        System.out.println("PHONE: " + phone);
-        System.out.println("COUNTRY: " + country);
-    };
     
     public String getCustomerId() {
         return customerId;

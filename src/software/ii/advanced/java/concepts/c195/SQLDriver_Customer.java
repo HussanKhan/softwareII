@@ -73,7 +73,6 @@ public class SQLDriver_Customer {
         
         } catch (Exception exc) {
             System.out.println(exc);
-            System.out.println("country");
         };
      
         return 0;
@@ -109,7 +108,6 @@ public class SQLDriver_Customer {
         
         } catch (Exception exc) {
             System.out.println(exc);
-            System.out.println("city");
         };
      
         return 0;
@@ -152,7 +150,6 @@ public class SQLDriver_Customer {
         
         } catch (Exception exc) {
             System.out.println(exc);
-            System.out.println("address");
 
         };
      
@@ -171,12 +168,12 @@ public class SQLDriver_Customer {
             String country,
 	    String username) {
         
-                // CHECK USER FOR INVALID POSTAL CODE
+         // CHECK USER FOR INVALID POSTAL CODE
          try {
               // see if all int
              Integer.parseInt(postal);
         } catch(Exception ex) {
-            new ErrorPopup().displayError("Invalid Postal Code");
+            new ErrorPopup().displayError("Invalid Postal Code", "Error");
             return 0;
         };
         
@@ -216,7 +213,7 @@ public class SQLDriver_Customer {
         
         } catch (Exception exc) {
             System.out.println(exc);
-            System.out.println("Customer");
+
         };
      
         return 1;
@@ -351,6 +348,7 @@ public class SQLDriver_Customer {
         try {
             // first delete old
             deleteCustomer( Integer.parseInt(id) );
+            
             // add new entry
                     // Add Customer
             int res = setCustomer(
@@ -418,7 +416,7 @@ public class SQLDriver_Customer {
     public int login(String userName, String passwordUser) {
         
         int queryState = 0;
-        
+
         try {
              ResultSet result = statement.executeQuery("SELECT username, password FROM user WHERE userName='" + userName + "' AND password='" + passwordUser + "';");
             
@@ -435,7 +433,7 @@ public class SQLDriver_Customer {
             throw new IllegalArgumentException("Invalid Login-In Information");
         };
         
-        return queryState;
+        return 0;
     };
     
 }

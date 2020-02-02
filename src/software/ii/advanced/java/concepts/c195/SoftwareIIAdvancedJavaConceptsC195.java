@@ -73,8 +73,8 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         GridPane.setConstraints(passwordInput, 1, 2);
         
         // Location
-        System.out.println(locale.getDisplayCountry());
-        System.out.println(locale.getDisplayLanguage()); 
+//        System.out.println(locale.getDisplayCountry());
+//        System.out.println(locale.getDisplayLanguage()); 
         
         Label country = new Label( getLangKey(langCode, countryCode, "country") + ": ");
         GridPane.setConstraints(country, 0, 3);
@@ -101,12 +101,17 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         
         // Login button
         Button loginButton = new Button( getLangKey(langCode, countryCode, "promptCat") );
+        
+        // Lamda to process user login click
         loginButton.setOnAction(e -> {
+            
+            userName = userInput.getText();
                  
             try {
-                apiDB.login(userInput.getText(), passwordInput.getText());
-                userName = userInput.getText();
+                int userId = apiDB.login(userInput.getText(), passwordInput.getText());
+                dataLogger.trackuser(userName);
                 primaryStage.setScene( new NAV_SCENE(null, primaryStage, userName).generateNavScene() );
+                appointmentCheck(userId);
             } catch(IllegalArgumentException excpt) {
                 errorCat.setText( getLangKey(langCode, countryCode, "errorCat") + ": ");
                 errorMessage.setText( getLangKey(langCode, countryCode, "errorMsg") );
@@ -150,15 +155,13 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         
         Scene scene = new Scene(root, 1280, 720);
         
-        appointmentCheck();
-        
         primaryStage.setTitle( getLangKey(langCode, countryCode, "promptCat") );
         primaryStage.setScene(scene);
         primaryStage.show();
     }
     
     // check if appointment within 15 min of user sign in
-    public int appointmentCheck() {
+    public int appointmentCheck(int userId) {
         
         SQLDriver_Appointment apiDB = new SQLDriver_Appointment();
         
@@ -170,16 +173,15 @@ public class SoftwareIIAdvancedJavaConceptsC195 extends Application {
         LocalDateTime timeUser = LocalDateTime.parse(timeStamp);
         ZonedDateTime localUserTime = ZonedDateTime.of(timeUser, ZoneId.of(TimeZone.getDefault().getID()) );
         localUserTime = localUserTime.withZoneSameInstant(ZoneOffset.UTC);
-        String currentTime = localUserTime.toString().replace('T', ' ').replace('Z', ' ').trim();
         String endTime = localUserTime.plusMinutes(15).toString().replace('T', ' ').replace('Z', ' ').trim();
         
         // throws error if appointment within 15 minutes
         try {
-            apiDB.appointmentOverlapCheck(currentTime, endTime);
+            apiDB.appointmentOverlapCheck( endTime, null, null, Integer.toString(userId));
         } catch (Exception err) {
             
             // opens popupr
-            new ErrorPopup().displayError("Appointment within 15 Minutes!");
+            new ErrorPopup().displayError("Appointment within 15 Minutes!", "Alert");
         };
                 
         return 0;

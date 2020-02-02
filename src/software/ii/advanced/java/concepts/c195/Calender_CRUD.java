@@ -59,10 +59,7 @@ public class Calender_CRUD {
         this.username = username;
         lastStage = mainStage;
         calenderGrid.setVgap(40); // spacing bewteen all objects
-        
-        System.out.println(month+1);
-        System.out.println(year);
-        
+
         // Set current appointments
         currentMonthAppointments = apiDB.AppointmentByMonth(Integer.toString(year), Integer.toString(month+1));
         
@@ -95,8 +92,6 @@ public class Calender_CRUD {
         
         ObservableList<String> daysInMonth = FXCollections.observableArrayList();
         
-        System.out.println("Month: " + month);
-        System.out.println("IMonth: " + mainCalender.get(Calendar.MONTH));
         
         while (month==mainCalender.get(Calendar.MONTH)) {
             daysInMonth.add( String.format("%s %s", mainCalender.getTime().getDay(), mainCalender.getTime().toString().split(" ")[2] ));           
@@ -240,7 +235,7 @@ public class Calender_CRUD {
         month = mainCalender.get(Calendar.MONTH);
         monthName = months[month];
         currentMonthAppointments = apiDB.AppointmentByMonth(Integer.toString(year), Integer.toString(month+1));
-        System.out.println(Integer.toString(month+1));
+    
         renderCalender(weekControl);
         
         return monthName;
@@ -321,7 +316,7 @@ public class Calender_CRUD {
                 calMode = "Week";
                 updateCalender("initWeek");
                 monthTitle.setText(monthName + " Week: " + weekNum);
-                System.out.println("Week Mode");
+        
             };
             
         });
@@ -331,7 +326,7 @@ public class Calender_CRUD {
                 calMode = "Month";
                 updateCalender("initMonth");
                 monthTitle.setText(monthName);
-                System.out.println("Month Mode");
+               
             };
         });
         

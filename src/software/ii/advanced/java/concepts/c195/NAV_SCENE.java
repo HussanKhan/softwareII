@@ -67,19 +67,17 @@ public class NAV_SCENE {
     public Button createButton(String title) {
         Button newButton = new Button( title );
 
-        newButton.setMinWidth(200);
-        newButton.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+        newButton.setMinWidth(500);
+        newButton.setPadding(new javafx.geometry.Insets(30, 30, 30, 30));
         
         return newButton;
     };
     
     public Button customerButton(Scene currentScene) {
 
-        Button customerButton = createButton("Customer Data");
+        Button customerButton = createButton("Customer");
         customerButton.setOnAction(e -> {
-            
-           System.out.println("CUSTOMER DATA CLICKED");
-           
+
            lastStage.setScene( new Customer_CRUD(currentScene, lastStage, username).generateCustomer());
            
         });
@@ -89,7 +87,7 @@ public class NAV_SCENE {
     
     public Button appointmentsButton(Scene currentScene) {
 
-        Button appointmentsButton = createButton("Appointments Data");
+        Button appointmentsButton = createButton("Appointments");
         appointmentsButton.setOnAction(e -> {
             
            lastStage.setScene( new Appointments_CRUD(currentScene, lastStage, username).generateAppointmentCRUD());
@@ -101,7 +99,7 @@ public class NAV_SCENE {
     
     public Button calenderButton(Scene currentScene) {
 
-        Button calenderButton = createButton("Calender Data");
+        Button calenderButton = createButton("Calendar");
         calenderButton.setOnAction(e -> {
             
            lastStage.setScene( new Calender_CRUD(currentScene, lastStage, username).generateCalender());
